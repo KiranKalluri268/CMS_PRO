@@ -1,0 +1,14 @@
+{
+  "name": "certificate-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "frontend": "cd frontend && npm start",
+    "backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
