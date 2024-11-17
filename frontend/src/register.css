@@ -1,0 +1,118 @@
+/* login.css */
+
+/* Center the entire container on the page */
+.register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full viewport height to center the box */
+    background-color: #f7f6f6;
+    margin: 0;
+  }
+  
+  /* Header styling */
+  .header {
+    width: 100%;
+    background-color: #fdfdfd; /* Change to your desired background color */
+    padding: 20px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: absolute;
+    top: 0;
+  }
+  
+  .header-logo {
+    max-width: 550px; /* Adjust the size of the logo */
+    height: auto;
+  }
+  
+  .register-title {
+    color: #970f0f;
+  }
+  /* Style the box that contains the form */
+  .register-box {
+    background-color: #ffffff;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Style the form elements */
+  .input-group {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  /* Style the labels */
+  .input-group label {
+    display: inline-block;
+    width: 80px; /* Adjust width to fit label */
+    font-size: 14px;
+    margin-right: 10px;
+    color: #333;
+    text-align: right;
+  }
+  
+  /* Style the input fields */
+  .input-group input,
+  .input-group select {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  
+  /* Style the submit button */
+  .register-box button {
+    width: 30%;
+    padding: 10px;
+    background-color: #e6bd39a8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  /* Add hover effect to the button */
+  .register-box button:hover {
+    background-color: #970f0f;
+  }
+  
+  /* Style the heading */
+  .register-box h1 {
+    font-size: 24px;
+    margin-top: 0px;
+    margin-bottom: 30px;
+  }
+  
+  /* Footer styling */
+  .footer {
+    width: 100%;
+    background-color: #333; /* Dark background color */
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    bottom: 0;
+  }
+  
+  .footer p {
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  
