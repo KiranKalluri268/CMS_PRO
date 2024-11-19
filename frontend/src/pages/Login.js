@@ -19,10 +19,25 @@ const Login = () => {
         // Check if `response` and `response.data` exist
         if (response && response.data) {
           console.log('Login successful:', response.data);
+        
           // Store the token in localStorage
-          localStorage.setItem('authToken', response.data.token);
-
-          window.location.href = `/student-home/${rollNumber}`;
+          const token = response.data.token;
+          localStorage.setItem('authToken', token);
+        
+          // Decode the token to extract userRole
+          const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decoding the JWT
+          const userRole = decodedToken.userRole; // Extract the role from the token
+        
+          console.log('Decoded user role:', userRole);
+        
+          // Redirect based on userRole
+          if (userRole === 'student') {
+            window.location.href = `/student-home/${decodedToken.userId}`; // Assuming userId is rollNumber
+          } else if (userRole === 'admin') {
+            window.location.href = '/admin-home'; // Admin doesn't need rollNumber in URL
+          } else {
+            console.error('Unknown role. Cannot navigate.');
+          }
         } else {
           console.log('Unexpected response structure:', response);
         }
