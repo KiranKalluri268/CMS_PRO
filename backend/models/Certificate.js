@@ -7,7 +7,7 @@ const certificateSchema = new mongoose.Schema({
   toDate: { type: Date, required: true },
   pdf: { type: String, required: true, unique: true  },
   student: { type: String, required: true },
-  year: { type: mongoose.Schema.Types.ObjectId, ref: "Year", required: false}
+  year: [{ type: mongoose.Schema.Types.ObjectId, ref: "Year", required: false}]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Certificate", certificateSchema);
