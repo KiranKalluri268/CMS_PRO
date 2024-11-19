@@ -1,4 +1,5 @@
 const Certificate = require("../models/Certificate");
+const Year = require("../models/Year");
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
@@ -83,6 +84,23 @@ exports.uploadCertificate = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
+    const parsedFromDate = new Date(fromDate);
+    const parsedToDate = new Date(toDate);
+
+    // Helper function to calculate academic years
+    const getAcademicYears = (start, end) => {
+      const years = [];
+      let currentYearStart = new Date(start.getFullYear(), 5, 1); // June 1 of the start year
+      while (currentYearStart <= end) {
+        const nextYearEnd = new Date(currentYearStart.getFullYear() + 1, 4, 31); // May 31 of the next year
+        years.push(`${currentYearStart.getFullYear()}-${currentYearStart.getFullYear() + 1}`);
+        currentYearStart = new Date(currentYearStart.getFullYear() + 1, 5, 1); // Move to next academic year start
+      }
+      return years;
+    };
+
+    const academicYears = getAcademicYears(parsedFromDate, parsedToDate);
+
     // Create a new certificate entry
     const certificate = new Certificate({
       organisation,
@@ -93,7 +111,28 @@ exports.uploadCertificate = async (req, res) => {
       student: req.userId,
     });
 
+    // Process academic years
+    const yearIds = [];
+    for (const year of academicYears) {
+      let academicYear = await Year.findOne({ year });
+      if (!academicYear) {
+        academicYear = new Year({ year, certificates: [] });
+        await academicYear.save();
+      }
+
+      // Add the certificate to the academic year's certificates list
+      if (!academicYear.certificates.includes(certificate._id)) {
+        academicYear.certificates.push(certificate._id);
+        await academicYear.save();
+      }
+
+      yearIds.push(academicYear._id); // Keep track of academic year IDs
+    }
+
+    // Update certificate with academic years
+    certificate.year = yearIds;
     await certificate.save();
+
     res.status(201).json({ certificate });
   } catch (error) {
     console.error("Error uploading certificate:", error);
