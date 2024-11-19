@@ -19,7 +19,10 @@ const Login = () => {
         // Check if `response` and `response.data` exist
         if (response && response.data) {
           console.log('Login successful:', response.data);
-          window.location.href = '/student-home';
+          // Store the token in localStorage
+          localStorage.setItem('authToken', response.data.token);
+
+          window.location.href = `/student-home/${rollNumber}`;
         } else {
           console.log('Unexpected response structure:', response);
         }
@@ -36,7 +39,7 @@ const Login = () => {
       </header>
 
       <div className="login-box">
-        <h1 class="login-title">Login</h1>
+        <h1 className="login-title">Login</h1>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="userID">User ID:</label>

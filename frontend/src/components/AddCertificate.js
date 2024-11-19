@@ -20,8 +20,11 @@ const AddCertificate = ({ rollNumber }) => {
     data.append('pdf', pdf);
 
     try {
-      await uploadCertificate(data);
+      
+      const token = localStorage.getItem("authToken");
+      await uploadCertificate(data ,token);
       alert('Certificate uploaded successfully');
+      window.location.href = `/student-home/${rollNumber}`;
     } catch (error) {
         if (error.response && error.response.status === 401) {
         console.error('Unauthorized! Redirecting to login...');
@@ -40,8 +43,8 @@ const AddCertificate = ({ rollNumber }) => {
       </header>
 
       <div className="upload-box">
-        <h1 class="upload-title">Upload Certificates</h1>
-    <form class="upload" onSubmit={handleSubmit} encType="multipart/form-data">
+        <h1 className="upload-title">Upload Certificates</h1>
+    <form className="upload" onSubmit={handleSubmit} encType="multipart/form-data">
     <div className="input-group">
       <label htmlFor="organisation">Organisation:</label>
       <input id="organisation" type="text" name="organisation" onChange={handleChange} placeholder="Organisation" required /><br/>

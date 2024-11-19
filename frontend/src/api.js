@@ -27,8 +27,8 @@ export const loginUser = (userData) => {
 };
 
 // Upload a certificate with authentication
-export const uploadCertificate = (formData, token) => {
-  return API.post("/certificates/upload", formData, {
+export const uploadCertificate = (data, token) => {
+  return API.post("/certificates/upload", data, {
     headers: {
       "x-auth-token": token,
       "Content-Type": "multipart/form-data",

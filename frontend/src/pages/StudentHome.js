@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { getCertificates } from '../api';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import '../studenthome.css';
 
-const StudentHome = ({ rollNumber }) => {
+const StudentHome = () => {
+  const { rollNumber } = useParams();
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
+  const token = localStorage.getItem("authToken");
 
   useEffect(() => {
     const fetchCertificates = async () => {
-      const res = await getCertificates(rollNumber);
+      const res = await getCertificates(rollNumber, token);
       setCertificates(res.data);
     };
     fetchCertificates();
   }, [rollNumber]);
 
-  // Function to handle downloading the PDF
   const handleDownload = (pdfUrl, fileName) => {
+    console.log("Download URL:", pdfUrl);  // Check the URL
     const link = document.createElement('a');
     link.href = pdfUrl;
     link.download = fileName || 'certificate.pdf';
     link.click();
   };
+  
 
   return (
     <div className="login-container">
