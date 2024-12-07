@@ -14,7 +14,7 @@ Make sure you have the following installed:
 1. **Clone the Repository**  
    Clone this repository to your local machine:
    ```bash
-   git clone (https://github.com/KiranKalluri268/CMS_PRO.git)
+   git clone "https://github.com/KiranKalluri268/CMS_PRO.git"
    ```
 
 2. **Navigate to the Project Directory**  
