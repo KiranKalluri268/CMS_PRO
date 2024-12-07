@@ -6,7 +6,7 @@ const certificateSchema = new mongoose.Schema({
   fromDate: { type: Date, required: true },
   toDate: { type: Date, required: true },
   pdf: { type: String, required: true, unique: true  },
-  student: { type: String, required: true },
+  student: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   year: [{ type: mongoose.Schema.Types.ObjectId, ref: "Year", required: false}]
 }, { timestamps: true });
 

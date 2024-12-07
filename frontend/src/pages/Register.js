@@ -20,7 +20,7 @@ const handleSubmit = async (event) => {
 
     // Check if response.data exists
     if (response && response.data) {
-      alert('Registration successful');
+      alert('Registration successful! Please verify your email before logging in.');
       // You might want to redirect the user to the login page
       window.location.href = '/';
     }
@@ -38,7 +38,7 @@ const handleSubmit = async (event) => {
       </header>
 
       <div className="register-box">
-        <h1 class="register-title">Register</h1>
+        <h1 className="register-title">Register</h1>
         <form onSubmit={handleSubmit}>
 
           {/* Roll No Input */}

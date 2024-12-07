@@ -6,6 +6,7 @@ import '../login.css';
 const Login = () => {
     const [rollNumber, setRollNumber] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
   
     const handleSubmit = async (event) => {
       event.preventDefault();
@@ -27,12 +28,17 @@ const Login = () => {
           // Decode the token to extract userRole
           const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decoding the JWT
           const userRole = decodedToken.userRole; // Extract the role from the token
-        
+          const userRollNumber = decodedToken.userRollNumber;
+          const userName = decodedToken.userName;
+
+          console.log('Decoded rollNumber:', userRollNumber);
           console.log('Decoded user role:', userRole);
+
+          alert(`Welcome, ${userName}`);
         
           // Redirect based on userRole
           if (userRole === 'student') {
-            window.location.href = `/student-home/${decodedToken.userId}`; // Assuming userId is rollNumber
+            window.location.href = `/student-home/${decodedToken.studentId}`; // Assuming userId is rollNumber
           } else if (userRole === 'admin') {
             window.location.href = '/admin-home'; // Admin doesn't need rollNumber in URL
           } else {
@@ -43,6 +49,7 @@ const Login = () => {
         }
       } catch (error) {
         console.error('Error during login:', error);
+        setError(error.response?.data?.message || "Login failed. Please try again.");
       }
     };
 
@@ -61,7 +68,7 @@ const Login = () => {
             <input
               id="userID"
               type="text"
-              placeholder="Enter your user ID"
+              placeholder="Enter UserID/RollNumber"
               value={rollNumber}
               onChange={(e) => setRollNumber(e.target.value)}
               required
@@ -78,12 +85,12 @@ const Login = () => {
               required
             />
           </div>
+          {error && <p style={{ color: 'red', margin: '10px 0' }}>{error}</p>}
           <button type="submit">Login</button>
           <br />
           <div className="links">
             <a href="/Forgot.js">Forgot Password?</a>
             <br />
-            {/* Use Link from react-router-dom for navigation */}
             <Link to="/register">Don't have an account? Register here</Link>
           </div>
         </form>

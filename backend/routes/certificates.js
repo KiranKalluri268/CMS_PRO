@@ -18,8 +18,8 @@ const upload = multer({ storage });
 const router = express.Router();
 
 // Route to upload a certificate PDF
-router.post("/upload", authMiddleware, upload.single("pdf"), uploadCertificate);
-router.get("/student/:rollNumber", authMiddleware, getCertificatesByStudent);
+router.post("/upload", authMiddleware.authenticate, upload.single("pdf"), uploadCertificate);
+router.get("/student/:id", authMiddleware.authenticate, getCertificatesByStudent);
 router.get('/certificates/:id', getCertificateById);
 router.put('/certificates/:id', upload.single('pdf'), updateCertificate);
 

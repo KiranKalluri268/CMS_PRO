@@ -51,14 +51,14 @@ exports.updateCertificate = async (req, res) => {
 exports.getCertificatesByStudent = async (req, res) => {
   try {
     // Find student by roll number
-    const student = await User.findOne({ rollNumber: req.params.rollNumber });
+    const student = await User.findOne({ _id: req.params.id });
 
     if (!student) {
       return res.status(404).json({ msg: "Student not found" });
     }else{console.log('student fount:',student);}
 
     // Fetch certificates for the student
-    const certificates = await Certificate.find({ student: student.rollNumber });
+    const certificates = await Certificate.find({ student: student._id });
 
     // Add pdfUrl to each certificate to make it accessible
     const certificatesWithUrls = certificates.map(cert => ({
@@ -108,7 +108,7 @@ exports.uploadCertificate = async (req, res) => {
       fromDate,
       toDate,
       pdf: req.file.path,
-      student: req.userId,
+      student: req.studentId,
     });
 
     // Process academic years

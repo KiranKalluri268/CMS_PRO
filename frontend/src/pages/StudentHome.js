@@ -5,18 +5,18 @@ import { useParams } from 'react-router-dom';
 import '../studenthome.css';
 
 const StudentHome = () => {
-  const { rollNumber } = useParams();
+  const { rollNumber: studentId } = useParams();
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
 
   useEffect(() => {
     const fetchCertificates = async () => {
-      const res = await getCertificates(rollNumber, token);
+      const res = await getCertificates(studentId, token);
       setCertificates(res.data);
     };
     fetchCertificates();
-  }, [rollNumber]);
+  }, [studentId, token]);
 
   const handleDownload = (pdfUrl, fileName) => {
     console.log("Download URL:", pdfUrl);  // Check the URL
@@ -25,7 +25,9 @@ const StudentHome = () => {
     link.download = fileName || 'certificate.pdf';
     link.click();
   };
-  
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  const userName = decodedToken.userName;
+  console.log('Decoded userName:', userName);
 
   return (
     <div className="login-container">
@@ -34,7 +36,7 @@ const StudentHome = () => {
         <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
       </header>
     <div>
-      <h1>Welcome, {rollNumber}</h1>
+      <h1>Welcome, {userName}</h1>
       <button onClick={() => navigate('/add-certificate')}>Add New Certificate</button>
 
       <table>

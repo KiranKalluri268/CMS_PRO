@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { uploadCertificate } from '../api';
 import '../addcertificate.css';
 
-const AddCertificate = ({ rollNumber }) => {
+const AddCertificate = ({ rollNumber: studentId }) => {
   const [formData, setFormData] = useState({ organisation: '', course: '', fromDate: '', toDate: '' });
   const [pdf, setPdf] = useState(null);
 
@@ -12,7 +12,7 @@ const AddCertificate = ({ rollNumber }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
-    data.append('rollNumber', rollNumber);
+    data.append('rollNumber', studentId);
     data.append('organisation', formData.organisation);
     data.append('course', formData.course);
     data.append('fromDate', formData.fromDate);
@@ -22,9 +22,12 @@ const AddCertificate = ({ rollNumber }) => {
     try {
       
       const token = localStorage.getItem("authToken");
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      console.log("decodedToken:",decodedToken);
+      const studentId = decodedToken.studentId;
       await uploadCertificate(data ,token);
       alert('Certificate uploaded successfully');
-      window.location.href = `/student-home/${rollNumber}`;
+      window.location.href = `/student-home/${studentId}`;
     } catch (error) {
         if (error.response && error.response.status === 401) {
         console.error('Unauthorized! Redirecting to login...');
@@ -41,7 +44,6 @@ const AddCertificate = ({ rollNumber }) => {
       <header className="header">
         <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
       </header>
-
       <div className="upload-box">
         <h1 className="upload-title">Upload Certificates</h1>
     <form className="upload" onSubmit={handleSubmit} encType="multipart/form-data">

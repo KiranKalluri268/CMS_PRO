@@ -1,0 +1,64 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import '../adminhome.css';
+
+const AdminHome = () => {
+  const [batches, setBatches] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        console.log("Token being sent:", localStorage.getItem("authToken"));
+        const response = await axios.get("/api/admin/batches", {
+            headers: { "x-auth-token": localStorage.getItem("authToken") },
+          });
+          console.log("Batches fetched:", response.data); 
+        setBatches(response.data.batches);
+      } catch (error) {
+        console.error("Error fetching batches:", error);
+      }
+    };
+    fetchBatches();
+  }, []);
+
+  const handleBatchSelect = (batchId, batchYear) => {
+    navigate(`/admin-report/${batchId}/${batchYear}`);
+  };
+
+  return (
+    <div className="admin-home-container">
+      {/* Header Section */}
+      <header className="header">
+        <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+      </header>
+  
+      <div className="batch-list">
+        <h2>Select a Batch</h2>
+        {console.log("Batches being rendered:", batches)} {/* Log batches here */}
+        {batches.length > 0 ? (
+          <ul>
+            {batches.map((batch) => (
+              <li key={batch._id}>
+              <button onClick={() => handleBatchSelect(batch._id, batch.year)}>
+              {batch.year}
+              </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No batches available at the moment.</p>
+        )}
+      </div>
+  
+      {/* Footer Section */}
+      <footer className="footer">
+        <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
+      </footer>
+    </div>
+  );
+  
+};
+
+export default AdminHome;
