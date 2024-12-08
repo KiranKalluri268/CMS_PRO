@@ -18,8 +18,8 @@ const AdminReport = () => {
             headers: { "x-auth-token": localStorage.getItem("authToken") },
           });
         console.log("Certificates fetched:", response.data);
-        setCertificates(response.data.certificates || []);
-        setFilteredCertificates(response.data.certificates || []); // Initialize filtered list
+        setCertificates(response.data || []);
+        setFilteredCertificates(response.data || []); // Initialize filtered list
       } catch (error) {
         console.error("Error fetching certificates:", error);
       }
@@ -42,6 +42,14 @@ const AdminReport = () => {
     } else {
       setFilteredCertificates(certificates); // Show all if no filter selected
     }
+  };
+
+  const handleDownload = (pdfUrl, fileName) => {
+    console.log("Download URL:", pdfUrl);  // Check the URL
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = fileName || 'certificate.pdf';
+    link.click();
   };
 
   return (
@@ -94,13 +102,7 @@ const AdminReport = () => {
                   <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
                   <td>{new Date(certificate.toDate).getFullYear()}</td>
                   <td>
-                    <a
-                      href={`/certificates/${certificate._id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Download PDF
-                    </a>
+                  <button onClick={() => handleDownload(certificate.pdfUrl, certificate.course)}>Download</button>
                   </td>
                 </tr>
               ))}

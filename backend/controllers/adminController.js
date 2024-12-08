@@ -30,9 +30,16 @@ const getCertificatesByBatch = async (req, res) => {
 
     // Fetch certificates where student ID matches any of the batch students
     const certificates = await Certificate.find({ student: { $in: studentIds } }).populate("student", "name rollNumber");
-    console.log("Certificates fetched:",certificates);
 
-    res.json({ certificates });
+    // Add pdfUrl to each certificate to make it accessible
+    const certificatesWithUrls = certificates.map(cert => ({
+      ...cert.toObject(),
+      pdfUrl: `${req.protocol}://${req.get('host')}/${cert.pdf.replace('\\', '/')}` // Adjust path to forward slashes
+    }));
+
+    // Respond with certificates including pdfUrl
+    console.log('certificates found:',certificatesWithUrls);
+    res.status(200).json(certificatesWithUrls);
   } catch (error) {
     console.error("Error fetching certificates:", error);
     res.status(500).json({ message: "Error fetching certificates" });

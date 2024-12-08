@@ -1,11 +1,10 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../editcertificate.css';
 
 const EditCertificate = () => {
-  const { id } = useParams(); // Extracts the "id" from the URL
-  const navigate = useNavigate();
+  const { id } = useParams();
   const [certificate, setCertificate] = useState({
     organisation: '',
     course: '',
@@ -58,8 +57,11 @@ const EditCertificate = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      const token = localStorage.getItem("authToken");
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const studentId = decodedToken.studentId;
       alert('Certificate updated successfully');
-      navigate('/');
+      window.location.href = `/student-home/${studentId}`;
     } catch (error) {
       console.error('Error updating certificate:', error);
     }
