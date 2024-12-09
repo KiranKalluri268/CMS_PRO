@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+/* App.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: url('../public/images/Vaagdevi-Logo.png') no-repeat center center fixed;
+  background-size: cover;
+  opacity: 0.9; /* Adjust the opacity to make it appear like a watermark */
+}
+
+#root {
+  height: 100%; /* Ensures that your app takes the full height */
+}
+
+.page-container {
+  position: relative; /* Ensures content is properly layered over the background */
+  z-index: 1;
+}

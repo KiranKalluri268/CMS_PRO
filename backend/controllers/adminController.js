@@ -34,7 +34,7 @@ const getCertificatesByBatch = async (req, res) => {
     // Add pdfUrl to each certificate to make it accessible
     const certificatesWithUrls = certificates.map(cert => ({
       ...cert.toObject(),
-      pdfUrl: `${req.protocol}://${req.get('host')}/${cert.pdf.replace('\\', '/')}` // Adjust path to forward slashes
+      pdfUrl: cert.pdf ? `${req.protocol}://${req.get('host')}/${cert.pdf.replace(/\\/g, '/')}` : null // Include pdfUrl if pdf exists, otherwise null
     }));
 
     // Respond with certificates including pdfUrl

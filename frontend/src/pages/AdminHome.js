@@ -8,6 +8,14 @@ const AdminHome = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const authToken = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    if (!authToken) {
+      alert("Unauthorized Access!, Login First!");
+      navigate('/');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     const fetchBatches = async () => {
       try {
         console.log("Token being sent:", localStorage.getItem("authToken"));
@@ -27,11 +35,23 @@ const AdminHome = () => {
     navigate(`/admin-report/${batchId}/${batchYear}`);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); // or sessionStorage
+    window.location.href = '/';
+  };
+  
+
   return (
     <div className="admin-home-container">
       {/* Header Section */}
       <header className="header">
         <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img
+        src="/images/logout-icon.jpg"
+        alt="Logout"
+        style={{ cursor: 'pointer', width: '60px', height: '60px' }}
+        onClick={handleLogout}
+        />
       </header>
   
       <div className="batch-list">

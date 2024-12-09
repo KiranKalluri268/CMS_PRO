@@ -1,25 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../adminreport.css"; // Add your CSS for this page
+import * as XLSX from "xlsx"; // Import XLSX library
+import "../adminreport.css";
 
 const AdminReport = () => {
   const { batchId, batchYear } = useParams(); // Get batchId from URL params
-  console.log("batchid from url:",batchId);
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
   const [academicYear, setAcademicYear] = useState(""); // State for filtering by academic year
+  const [years, setYears] = useState([]); // State for storing available academic years
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
-        console.log("Fetching certificates for batchId:", batchId);
         const response = await axios.get(`/api/admin/batches/${batchId}/certificates`, {
-            headers: { "x-auth-token": localStorage.getItem("authToken") },
-          });
-        console.log("Certificates fetched:", response.data);
-        setCertificates(response.data || []);
-        setFilteredCertificates(response.data || []); // Initialize filtered list
+          headers: { "x-auth-token": localStorage.getItem("authToken") },
+        });
+        const sortedCertificates = (response.data || []).sort(
+          (a, b) => new Date(a.toDate) - new Date(b.toDate)
+        );
+        setCertificates(sortedCertificates);
+        setFilteredCertificates(sortedCertificates);
+
+        // Dynamically populate academic years
+        const uniqueYears = [...new Set(response.data.map(certificate => new Date(certificate.toDate).getFullYear()))];
+        setYears(uniqueYears);
       } catch (error) {
         console.error("Error fetching certificates:", error);
       }
@@ -28,8 +42,7 @@ const AdminReport = () => {
     fetchCertificates();
   }, [batchId]);
 
-   // Handle academic year filter
-   const handleFilterChange = (event) => {
+  const handleFilterChange = (event) => {
     const selectedYear = event.target.value;
     setAcademicYear(selectedYear);
 
@@ -40,7 +53,7 @@ const AdminReport = () => {
       });
       setFilteredCertificates(filtered);
     } else {
-      setFilteredCertificates(certificates); // Show all if no filter selected
+      setFilteredCertificates(certificates);
     }
   };
 
@@ -52,15 +65,56 @@ const AdminReport = () => {
     link.click();
   };
 
+  const handleCertificateLinkClick = (certificateLink) => {
+    if (certificateLink) {
+      window.open(certificateLink, '_blank');
+    } else {
+      alert("No link available for this certificate.");
+    }
+  };
+
+  const handleDownloadExcel = () => {
+    // Create a workbook and add the filtered certificates as a worksheet
+    const ws = XLSX.utils.json_to_sheet(
+      filteredCertificates.map((certificate, index) => ({
+        SNo: index + 1,
+        RollNo: certificate.student.rollNumber,
+        Name: certificate.student.name,
+        Organisation: certificate.organisation,
+        Course: certificate.course,
+        FromDate: new Date(certificate.fromDate).toLocaleDateString(),
+        ToDate: new Date(certificate.toDate).toLocaleDateString(),
+        AcademicYear: new Date(certificate.toDate).getFullYear(),
+      }))
+    );
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Certificates");
+
+    // Write the workbook to a file
+    XLSX.writeFile(wb, `Batch_${batchYear}_Certificates_Report.xlsx`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); // or sessionStorage
+    window.location.href = '/';
+  };
+
   return (
     <div className="admin-report-container">
       <header className="header">
         <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img
+        src="/images/logout-icon.jpg"
+        alt="Logout"
+        style={{ cursor: 'pointer', width: '60px', height: '60px' }}
+        onClick={handleLogout}
+        />
       </header>
 
       <div className="report-list">
-      <h2>Certificates for Batch {batchYear}</h2>
-        {/* Academic Year Filter */}
+        <h2>Certificates for Batch {batchYear}</h2>
+
         <div className="filter-container">
           <label htmlFor="academic-year-filter">Filter by Academic Year:</label>
           <select
@@ -69,11 +123,15 @@ const AdminReport = () => {
             onChange={handleFilterChange}
           >
             <option value="">All Years</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
+            {years.length > 0 && years.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
           </select>
         </div>
+
+        <button className="download-report-btn" onClick={handleDownloadExcel}>
+          Download Report as Excel
+        </button>
 
         {filteredCertificates.length > 0 ? (
           <table className="certificate-table">
@@ -97,12 +155,24 @@ const AdminReport = () => {
                   <td>{certificate.student.rollNumber}</td>
                   <td>{certificate.student.name}</td>
                   <td>{certificate.organisation}</td>
-                  <td>{certificate.course}</td>
+                  <td>
+                    <span
+                      style={{ color: certificate.certificateLink ? 'blue' : 'black', cursor: certificate.certificateLink ? 'pointer' : 'default' }}
+                      onClick={() => handleCertificateLinkClick(certificate.certificateLink)}
+                    >
+                      {certificate.course}
+                    </span>
+                  </td>
                   <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
                   <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
                   <td>{new Date(certificate.toDate).getFullYear()}</td>
                   <td>
-                  <button onClick={() => handleDownload(certificate.pdfUrl, certificate.course)}>Download</button>
+                    <button
+                      onClick={() => handleDownload(certificate.pdfUrl, certificate.course)}
+                      disabled={!certificate.pdfUrl}
+                    >
+                      {certificate.pdfUrl ? "Download" : "No PDF Available"}
+                    </button>
                   </td>
                 </tr>
               ))}

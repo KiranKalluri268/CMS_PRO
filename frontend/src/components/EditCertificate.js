@@ -1,4 +1,4 @@
-import { useParams, } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../editcertificate.css';
@@ -13,6 +13,14 @@ const EditCertificate = () => {
     pdf: '',
   });
   const [file, setFile] = useState(null);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     // Fetch the certificate details by ID
@@ -71,6 +79,27 @@ const EditCertificate = () => {
     return <div>Loading...</div>;
   }
 
+  const handleDelete = async () => {
+    try {
+      const confirmDelete = window.confirm('Are you sure you want to delete this certificate?');
+      if (!confirmDelete) return;
+  
+      await axios.delete(`http://localhost:5001/api/certificates/certificates/${id}`, {
+        headers: { "x-auth-token": localStorage.getItem("authToken") },
+      });
+      alert('Certificate deleted successfully');
+      const token = localStorage.getItem("authToken");
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const studentId = decodedToken.studentId;
+  
+      window.location.href = `/student-home/${studentId}`;
+    } catch (error) {
+      console.error('Error deleting certificate:', error);
+      alert('Failed to delete the certificate.');
+    }
+  };
+  
+
   return (
     <div className="edit-form-container">
       {/* Header Section */}
@@ -128,7 +157,12 @@ const EditCertificate = () => {
         <label>Upload PDF:</label>
         <input type="file" name="pdf" accept=".pdf" onChange={handleFileChange} />
         <br /></div>
+        <div className='buttons'>
         <button type="submit">Save Changes</button>
+        <button type="button" onClick={handleDelete} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
+          Delete Certificate
+        </button>
+        </div>
       </form>
     </div>
 

@@ -1,14 +1,17 @@
 const express = require("express");
-const { uploadCertificate } = require("../controllers/certificateController");
-const { getCertificatesByStudent } = require("../controllers/certificateController");
-const { getCertificateById } = require('../controllers/certificateController');
-const { updateCertificate } = require('../controllers/certificateController');
+const {
+  uploadCertificate,
+  getCertificatesByStudent,
+  getCertificateById,
+  updateCertificate,
+  deleteCertificate,
+} = require("../controllers/certificateController");
 const authMiddleware = require("../middleware/authMiddleware");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -19,8 +22,17 @@ const router = express.Router();
 
 // Route to upload a certificate PDF
 router.post("/upload", authMiddleware.authenticate, upload.single("pdf"), uploadCertificate);
+
+// Route to get certificates by student ID
 router.get("/student/:id", authMiddleware.authenticate, getCertificatesByStudent);
-router.get('/certificates/:id', getCertificateById);
-router.put('/certificates/:id', upload.single('pdf'), updateCertificate);
+
+// Route to get a certificate by ID
+router.get("/certificates/:id", getCertificateById);
+
+// Route to update a certificate
+router.put("/certificates/:id", upload.single("pdf"), updateCertificate);
+
+// Route to delete a certificate by ID
+router.delete("/certificates/:id", authMiddleware.authenticate, deleteCertificate);
 
 module.exports = router;

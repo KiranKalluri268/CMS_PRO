@@ -8,12 +8,21 @@ const StudentHome = () => {
   const { rollNumber: studentId } = useParams();
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem('authToken');
+  useEffect(() => {
+    const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCertificates = async () => {
       const res = await getCertificates(studentId, token);
-      setCertificates(res.data);
+      const sortedCertificates = (res.data || []).sort(
+        (a, b) => new Date(a.toDate) - new Date(b.toDate)
+      );
+      setCertificates(sortedCertificates);
     };
     fetchCertificates();
   }, [studentId, token]);
@@ -25,20 +34,41 @@ const StudentHome = () => {
     link.download = fileName || 'certificate.pdf';
     link.click();
   };
+
+  const handleCertificateLinkClick = (certificateLink) => {
+    if (certificateLink) {
+      window.open(certificateLink, '_blank');
+    } else {
+      alert("No link available for this certificate.");
+    }
+  };
+
   const decodedToken = JSON.parse(atob(token.split('.')[1]));
   const userName = decodedToken.userName;
   console.log('Decoded userName:', userName);
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); // or sessionStorage
+    window.location.href = '/';
+  };
 
   return (
     <div className="login-container">
       {/* Header Section */}
       <header className="header">
         <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img
+        src="/images/logout-icon.jpg"
+        alt="Logout"
+        style={{ cursor: 'pointer', width: '60px', height: '60px' }}
+        onClick={handleLogout}
+        />
       </header>
-    <div>
+    <div className='list'>
+      <div className='nav'>
       <h1>Welcome, {userName}</h1>
       <button onClick={() => navigate('/add-certificate')}>Add New Certificate</button>
-
+      </div>
       <table>
         <thead>
           <tr>
@@ -64,12 +94,24 @@ const StudentHome = () => {
                 <tr key={cert._id}>
                   <td>{index + 1}</td>
                   <td>{cert.organisation}</td>
-                  <td>{cert.course}</td>
+                  <td>
+                    <span
+                      style={{ color: cert.certificateLink ? 'blue' : 'black', cursor: cert.certificateLink ? 'pointer' : 'default' }}
+                      onClick={() => handleCertificateLinkClick(cert.certificateLink)}
+                    >
+                      {cert.course}
+                    </span>
+                  </td>
                   <td>{fromDate}</td>
                   <td>{toDate}</td>
                   <td>{academicYear}</td>
                   <td>
-                    <button onClick={() => handleDownload(cert.pdfUrl, cert.course)}>Download</button>
+                    <button 
+                      onClick={() => handleDownload(cert.pdfUrl, cert.course)}
+                      disabled={!cert.pdfUrl}
+                    >
+                      {cert.pdfUrl ? 'Download' : 'No PDF Available'}
+                    </button>
                   </td>
                   <td>
                     <button onClick={() => navigate(`/edit-certificate/${cert._id}`)}>Edit</button>

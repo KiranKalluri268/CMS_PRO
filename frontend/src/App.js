@@ -1,3 +1,5 @@
+import React from 'react';
+//import './App.css';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import StudentHome from "./pages/StudentHome";
 import AdminHome from "./pages/AdminHome";
