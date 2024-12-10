@@ -26,7 +26,7 @@ const EditCertificate = () => {
     // Fetch the certificate details by ID
     const fetchCertificate = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/certificates/certificates/${id}`);
+        const response = await axios.get(`/api/certificates/certificates/${id}`);
         setCertificate(response.data);
       } catch (error) {
         console.error('Error fetching certificate:', error);
@@ -60,7 +60,7 @@ const EditCertificate = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5001/api/certificates/certificates/${id}`, formData, {
+      await axios.put(`/api/certificates/certificates/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -84,7 +84,7 @@ const EditCertificate = () => {
       const confirmDelete = window.confirm('Are you sure you want to delete this certificate?');
       if (!confirmDelete) return;
   
-      await axios.delete(`http://localhost:5001/api/certificates/certificates/${id}`, {
+      await axios.delete(`/api/certificates/certificates/${id}`, {
         headers: { "x-auth-token": localStorage.getItem("authToken") },
       });
       alert('Certificate deleted successfully');

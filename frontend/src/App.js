@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import axios from 'axios';
 //import './App.css';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import StudentHome from "./pages/StudentHome";
@@ -10,7 +11,13 @@ import EditCertificate from './components/EditCertificate';
 import AdminReport from './components/AdminReport';
 import VerifyEmail from './components/EmailVerification';
 
+// Set the global baseURL for all Axios requests
+axios.defaults.baseURL = process.env.REACT_APP_API_URL; // or use an environment variable for flexibility
+
 function App() {
+  useEffect(() => {
+    // You can add other global configurations or logic here if needed
+  }, []);
   return (
     <Router>
       <Routes>

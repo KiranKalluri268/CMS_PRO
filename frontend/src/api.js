@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5001/api";
+const API_URL = process.env.REACT_APP_API_URL;
 
 // Axios instance to set default headers
 const API = axios.create({
