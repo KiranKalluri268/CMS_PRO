@@ -29,7 +29,7 @@ app.use(cors({
   origin: process.env.BASE_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true, // Enable cookies if needed
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
 }));
 
 // Connect to MongoDB
