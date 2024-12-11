@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, "/mnt/data/uploads")));
+app.use('/uploads', express.static(path.join(__dirname, "/uploads")));
 //app.use('/uploads', express.static(path.join(__dirname, "/uploads")));
 app.use(cors({
   origin: process.env.BASE_URL,

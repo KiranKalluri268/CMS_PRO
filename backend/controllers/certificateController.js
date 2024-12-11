@@ -65,17 +65,11 @@ exports.getCertificatesByStudent = async (req, res) => {
     const certificates = await Certificate.find({ student: student._id });
 
     // Add pdfUrl to each certificate if the PDF exists
-    /*const certificatesWithUrls = certificates.map((cert) => ({
-      ...cert.toObject(),
-      pdfUrl: cert.pdf ? `${req.protocol}://${req.get("host")}/${cert.pdf.replace(/\\/g, "/")}` : null,
-    }));*/
-
     const certificatesWithUrls = certificates.map((cert) => ({
       ...cert.toObject(),
-      pdfUrl: cert.pdf ? `${req.protocol}://${req.get("host")}/uploads/${cert.pdf.replace(/\\/g, "/")}` : null,
+      pdfUrl: cert.pdf ? `${req.protocol}://${req.get("host")}/${cert.pdf.replace(/\\/g, "/")}` : null,
     }));
     
-
     // Respond with certificates including pdfUrl
     console.log('certificates found:',certificatesWithUrls);
     res.status(200).json(certificatesWithUrls);
