@@ -7,16 +7,19 @@
     align-items: center;
     justify-content: center;
     height: 90vh; /* Full viewport height to center the box */
-    background-color: #f7f6f6;
+    background-color: #f7f1f1;
     margin: 0;
   }
   
   /* Header styling */
+  .header {
+    background-color: hsla(0, 22%, 93%, 0.897) !important;
+  }
  
   
-  .header-logo {
-    max-width: 550px; /* Adjust the size of the logo */
-    height: auto;
+  .LoginHeader-logo {
+    max-width: auto; /* Adjust the size of the logo */
+    height: 150px;
   }
   
   .login-title {

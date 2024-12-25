@@ -34,7 +34,7 @@ const handleSubmit = async (event) => {
     <div className="register-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img src="/images/vaagdevi.png" alt="Logo" className="RegisterHeader-logo" />
       </header>
 
       <div className="register-box">

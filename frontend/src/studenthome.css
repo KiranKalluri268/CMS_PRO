@@ -23,9 +23,9 @@
   z-index: 1000; 
 } */
 
-.header-logo {
-  max-width: 100px; /* Adjust the size of the logo */
-  height: auto;
+.StudentHeader-logo {
+  max-width: auto; /* Adjust the size of the logo */
+  height: 140px;
 }
 
 .list {

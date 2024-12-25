@@ -7,7 +7,7 @@
     align-items: center;
     justify-content: center;
     height: 100vh; /* Full viewport height to center the box */
-    background-color: #f7f6f6;
+    background-color: #f5f0f0;
     margin: 0;
   }
   
@@ -22,9 +22,9 @@
     top: 0;
   } */
   
-  .header-logo {
-    max-width: 550px; /* Adjust the size of the logo */
-    height: auto;
+  .RegisterHeader-logo {
+    width: auto; /* Adjust the size of the logo */
+    height: 150px;
   }
   
   .register-title {
@@ -32,9 +32,9 @@
   }
   /* Style the box that contains the form */
   .register-box {
-    background-color: #ffffff;
+    background-color: #e9e1e1;
     padding: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     width: 300px;
     text-align: center;

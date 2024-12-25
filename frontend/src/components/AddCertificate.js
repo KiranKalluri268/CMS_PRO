@@ -53,7 +53,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   return (
     <div className="upload-form-container">
       <header className="header">
-        <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img src="/images/vaagdevi.png" alt="Logo" className="AddCertificateHeader-logo" />
       </header>
       <div className="upload-box">
         <h1 className="upload-title">Upload Certificates</h1>

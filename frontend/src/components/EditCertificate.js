@@ -102,7 +102,7 @@ const EditCertificate = () => {
     <div className="edit-form-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/VCE-Logo-1(transparent).png" alt="Logo" className="header-logo" />
+        <img src="/images/Vaagdevi.png" alt="Logo" className="EditHeader-logo" />
       </header>
     <div className="edit-box">
       <h2 className="edit-title">Edit Certificate</h2>

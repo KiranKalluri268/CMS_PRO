@@ -22,9 +22,9 @@
     top: 0;
   }
   
-  .header-logo {
-    max-width: 550px; /* Adjust the size of the logo */
-    height: auto;
+  .AdminHeader-logo {
+    max-width: auto; /* Adjust the size of the logo */
+    height: 140px;
   }
   
   .batch-title {

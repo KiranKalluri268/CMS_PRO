@@ -25,9 +25,9 @@ header {
   z-index: 1000; /* Ensure it stays above other elements */
 }
 
-.header-logo {
-  max-width: 550px; /* Adjust the size of the logo */
-  height: auto;
+.AdminReportHeader-logo {
+  max-width: auto; /* Adjust the size of the logo */
+  height: 140px;
 }
 
 .batch-title {

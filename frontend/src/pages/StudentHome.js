@@ -89,9 +89,9 @@ const StudentHome = () => {
     <div className="login-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img src="/images/vaagdevi.png" alt="Logo" className="StudentHeader-logo" />
         <img
-          src="/images/logout-icon.jpg"
+          src="/images/logout-icon.png"
           alt="Logout"
           style={{ cursor: 'pointer', width: '60px', height: '60px' }}
           onClick={handleLogout}

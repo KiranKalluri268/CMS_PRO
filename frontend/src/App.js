@@ -10,6 +10,8 @@ import AddCertificate from './components/AddCertificate';
 import EditCertificate from './components/EditCertificate';
 import AdminReport from './components/AdminReport';
 import VerifyEmail from './components/EmailVerification';
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 // Set the global baseURL for all Axios requests
 axios.defaults.baseURL = process.env.REACT_APP_API_URL; // or use an environment variable for flexibility
@@ -29,6 +31,8 @@ function App() {
         <Route path="/edit-certificate/:id" element={<EditCertificate/>} />
         <Route path="/admin-report/:batchYear" element={<AdminReport/>} />
         <Route path="/verify-email" element={<VerifyEmail/>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

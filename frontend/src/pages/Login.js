@@ -58,7 +58,7 @@ const Login = () => {
     <div className="login-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img src="/images/vaagdevi.png" alt="Logo" className="LoginHeader-logo" />
       </header>
 
       <div className="login-box">
@@ -90,7 +90,7 @@ const Login = () => {
           <button type="submit">Login</button>
           <br />
           <div className="links">
-            <a href="/Forgot.js">Forgot Password?</a>
+            <Link to="/forgot-password">Forgot Password?</Link>
             <br />
             <Link to="/register">Don't have an account? Register here</Link>
           </div>
