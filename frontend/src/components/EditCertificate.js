@@ -11,6 +11,7 @@ const EditCertificate = () => {
     fromDate: '',
     toDate: '',
     pdf: '',
+    certificateLink: '',  // New field for certificate link
   });
   const [file, setFile] = useState(null);
 
@@ -55,6 +56,7 @@ const EditCertificate = () => {
     formData.append('course', certificate.course);
     formData.append('fromDate', certificate.fromDate);
     formData.append('toDate', certificate.toDate);
+    formData.append('certificateLink', certificate.certificateLink); // Add certificateLink to form data
     if (file) {
       formData.append('pdf', file);
     }
@@ -75,10 +77,6 @@ const EditCertificate = () => {
     }
   };
 
-  if (!certificate) {
-    return <div>Loading...</div>;
-  }
-
   const handleDelete = async () => {
     try {
       const confirmDelete = window.confirm('Are you sure you want to delete this certificate?');
@@ -90,7 +88,7 @@ const EditCertificate = () => {
       alert('Certificate deleted successfully');
       const token = localStorage.getItem("authToken");
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const studentId = decodedToken.studentId;
+      const studentId = decodedToken.userId;
   
       window.location.href = `/student-home/${studentId}`;
     } catch (error) {
@@ -104,64 +102,81 @@ const EditCertificate = () => {
     <div className="edit-form-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.jpg" alt="Logo" className="header-logo" />
+        <img src="/images/VCE-Logo-1(transparent).png" alt="Logo" className="header-logo" />
       </header>
     <div className="edit-box">
       <h2 className="edit-title">Edit Certificate</h2>
       <form className="edit" onSubmit={handleSubmit}>
-      <div className="input-group">
-        <label htmlFor="organisation">Organisation:</label>
-        <input
-          id="organisation"
-          type="text"
-          name="organisation"
-          value={certificate.organisation}
-          onChange={handleChange}
-          required
-        /></div>
+        <div className="input-group">
+          <label htmlFor="organisation">Organisation:</label>
+          <input
+            id="organisation"
+            type="text"
+            name="organisation"
+            value={certificate.organisation}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <br />
         <div className="input-group">
-        <label htmlFor="Course">Course:</label>
-        <input
-          id="Course"
-          type="text"
-          name="course"
-          value={certificate.course}
-          onChange={handleChange}
-          required
-        /></div>
+          <label htmlFor="course">Course:</label>
+          <input
+            id="course"
+            type="text"
+            name="course"
+            value={certificate.course}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <br />
         <div className="input-group">
-        <label htmlFor="fromDate">From Date:</label>
-        <input
-          id="fromDate"
-          type="date"
-          name="fromDate"
-          value={certificate.fromDate?.slice(0, 10)}
-          onChange={handleChange}
-          required
-        /></div>
+          <label htmlFor="fromDate">From Date:</label>
+          <input
+            id="fromDate"
+            type="date"
+            name="fromDate"
+            value={certificate.fromDate?.slice(0, 10)}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <br />
         <div className="input-group">
-        <label htmlFor="toDate">To Date:</label>
-        <input
-          id="toDate"
-          type="date"
-          name="toDate"
-          value={certificate.toDate?.slice(0, 10)}
-          onChange={handleChange}
-          required
-        /></div>
+          <label htmlFor="toDate">To Date:</label>
+          <input
+            id="toDate"
+            type="date"
+            name="toDate"
+            value={certificate.toDate?.slice(0, 10)}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <br />
         <div className="input-group">
-        <label>Upload PDF:</label>
-        <input type="file" name="pdf" accept=".pdf" onChange={handleFileChange} />
-        <br /></div>
-        <div className='buttons'>
-        <button type="submit">Save Changes</button>
-        <button type="button" onClick={handleDelete} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
-          Delete Certificate
-        </button>
+          <label htmlFor="certificateLink">Certificate Link:</label>
+          <input
+            id="certificateLink"
+            type="url"
+            name="certificateLink"
+            value={certificate.certificateLink}
+            onChange={handleChange}
+            placeholder="Enter certificate URL"
+          />
+        </div>
+        <br />
+        <div className="input-group">
+          <label>Upload PDF:</label>
+          <input type="file" name="pdf" accept=".pdf" onChange={handleFileChange} />
+          <br />
+        </div>
+        <div className="buttons">
+          <button type="submit">Save Changes</button>
+          <button type="button" onClick={handleDelete} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
+            Delete Certificate
+          </button>
         </div>
       </form>
     </div>

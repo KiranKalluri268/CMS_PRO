@@ -1,5 +1,3 @@
-/* login.css */
-
 /* Center the entire container on the page */
 .edit-form-container {
     display: flex;
@@ -7,14 +5,14 @@
     align-items: center;
     justify-content: center;
     height: 100vh; /* Full viewport height to center the box */
-    background-color: #f7f6f6;
+    background-color: #000000;
     margin: 0;
   }
   
   /* Header styling */
   .header {
     width: 100%;
-    background-color: #fdfdfd; /* Change to your desired background color */
+    background-color: #000000; /* Change to your desired background color */
     padding: 20px 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -23,7 +21,7 @@
   }
   
   .header-logo {
-    max-width: 550px; /* Adjust the size of the logo */
+    width: 450px; /* Adjust the size of the logo */
     height: auto;
   }
   

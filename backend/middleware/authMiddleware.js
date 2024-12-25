@@ -12,8 +12,8 @@ module.exports = {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.userRollNumber = decoded.userRollNumber;
-      req.studentId = decoded.studentId;
+      req.userRollNumber = decoded.userRollnumber;
+      req.studentId = decoded.userId;
       req.role = decoded.userRole; // Added role extraction
       console.log("decoded in middleware:", req.userRollNumber, req.studentId, req.role);
       next();

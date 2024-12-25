@@ -27,8 +27,9 @@ const Login = () => {
         
           // Decode the token to extract userRole
           const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decoding the JWT
+          console.log("Decoded in frontend login:",decodedToken);
           const userRole = decodedToken.userRole; // Extract the role from the token
-          const userRollNumber = decodedToken.userRollNumber;
+          const userRollNumber = decodedToken.userRollnumber;
           const userName = decodedToken.userName;
 
           console.log('Decoded rollNumber:', userRollNumber);
@@ -38,7 +39,7 @@ const Login = () => {
         
           // Redirect based on userRole
           if (userRole === 'student') {
-            window.location.href = `/student-home/${decodedToken.studentId}`; // Assuming userId is rollNumber
+            window.location.href = `/student-home/${decodedToken.userId}`; // Assuming userId is rollNumber
           } else if (userRole === 'admin') {
             window.location.href = '/admin-home'; // Admin doesn't need rollNumber in URL
           } else {

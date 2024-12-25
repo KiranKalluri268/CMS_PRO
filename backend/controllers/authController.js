@@ -1,78 +1,101 @@
-const User = require("../models/User");
+const { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand } = require('@aws-sdk/client-dynamodb');
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Batch = require("../models/Batch"); // Import Batch model
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const VerificationToken = require("../models/VerificationToken"); // New model for storing tokens
+const { v4: uuidv4 } = require("uuid");
+const { addItem } = require("../util/dynamodb");  // Import the addItem function
+const dynamoDB = require("../util/dynamodb").dynamoDB;
+
+//console.log("access key",process.env.AWS_ACCESS_KEY_ID);
+//console.log("secret key",process.env.AWS_SECRET_ACCESS_KEY);
+
+const USERS_TABLE = process.env.USERS_TABLE || "Users";
+const BATCHES_TABLE = process.env.BATCHES_TABLE || "Batches";
+const VERIFICATION_TOKENS_TABLE = process.env.VERIFICATION_TOKENS_TABLE || "VerificationTokens";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com", // 'smtp.gmail.com'
-  port: 587, // 587
-  secure: false, // Use TLS (false for 587, true for 465)
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: 'certificatesmanagement.verify@gmail.com', // Your Gmail email
-    pass: 'ztyz ojtk wfvm asgj', // Your Gmail App Password
+    user: 'certificatesmanagement.verify@gmail.com',
+    pass: 'ztyz ojtk wfvm asgj',
   },
 });
 
-
-// Register Function (Updated)
+// Register Function
 exports.register = async (req, res) => {
   try {
     const { name, rollNumber, email, password } = req.body;
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Extract batch year from rollNumber
     const year = "20" + rollNumber.substring(0, 2);
 
-    // Find or create a batch
-    let batch = await Batch.findOne({ year });
-    if (!batch) {
-      batch = new Batch({ year, students: [] });
-      await batch.save();
+    // Check if batch exists
+    console.log(marshall)
+    const batchParams = {
+      TableName: BATCHES_TABLE,
+      Key: marshall({ year }),
+    };
+    const batchData = await dynamoDB.send(new GetItemCommand(batchParams));
+
+    if (!batchData.Item) {
+      // Create new batch if it doesn't exist
+      const newBatch = {
+        year,
+        students: [],
+      };
+      await addItem(BATCHES_TABLE, newBatch);  // Use addItem function
     }
 
     // Create the new user
-    const user = new User({
+    const userId = uuidv4();
+    const newUser = {
+      userId,
       name,
       rollNumber,
       email,
       password: hashedPassword,
       role: "student",
-      batch: batch._id,
-      isVerified: false, // Add verification flag
-    });
-    await user.save();
+      batchYear: year,
+      isVerified: false,
+    };
+    await addItem(USERS_TABLE, newUser);  // Use addItem function
 
-    // Add the student to the batch
-    batch.students.push(user._id);
-    await batch.save();
+    // Add user to batch
+    const updateBatchParams = {
+      TableName: BATCHES_TABLE,
+      Key: marshall({ year }),
+      UpdateExpression: "SET students = list_append(if_not_exists(students, :emptyList), :newStudent)",
+      ExpressionAttributeValues: marshall({
+        ":emptyList": [],
+        ":newStudent": [userId],
+      }),
+    };
+    await dynamoDB.send(new UpdateItemCommand(updateBatchParams));
 
     // Create email verification token
     const token = crypto.randomBytes(32).toString("hex");
-    const verificationToken = new VerificationToken({
-      userId: user._id,
+    const verificationToken = {
       token,
-    });
-    await verificationToken.save();
+      userId,
+    };
+    await addItem(VERIFICATION_TOKENS_TABLE, verificationToken);  // Use addItem function
 
-    // Dynamic URL based on environment
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';  // Default to localhost if BASE_URL is not defined
     // Send verification email
-const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
 
-await transporter.sendMail({
-  from: process.env.EMAIL_FROM,
-  to: user.email,
-  subject: "Verify your email",
-  html: `<p>Hello ${name},</p>
-         <p>Please verify your email by clicking the link below:</p>
-         <a href="${verificationUrl}">${verificationUrl}</a>`,
-});
-
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Verify your email",
+      html: `<p>Hello ${name},</p>
+             <p>Please verify your email by clicking the link below:</p>
+             <a href="${verificationUrl}">${verificationUrl}</a>`,
+    });
 
     res.status(201).send({ message: "Registration successful! Please verify your email." });
   } catch (error) {
@@ -85,22 +108,41 @@ await transporter.sendMail({
 exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
-    console.log("verification token in controller:",token);
-    const verificationToken = await VerificationToken.findOne({ token });
-    if (!verificationToken) {
+
+    const tokenParams = {
+      TableName: VERIFICATION_TOKENS_TABLE,
+      Key: marshall({ token }),
+    };
+    const tokenData = await dynamoDB.send(new GetItemCommand(tokenParams));
+    if (!tokenData.Item) {
       return res.status(400).send({ message: "Invalid or expired token" });
     }
 
-    // Mark user as verified
-    const user = await User.findById(verificationToken.userId);
-    if (!user) {
+    const userParams = {
+      TableName: USERS_TABLE,
+      Key: marshall({ userId: unmarshall(tokenData.Item).userId }),
+    };
+    const userData = await dynamoDB.send(new GetItemCommand(userParams));
+    if (!userData.Item) {
       return res.status(404).send({ message: "User not found" });
     }
-    user.isVerified = true;
-    await user.save();
+
+    const updateUserParams = {
+      TableName: USERS_TABLE,
+      Key: marshall({ userId: unmarshall(tokenData.Item).userId }),
+      UpdateExpression: "SET isVerified = :true",
+      ExpressionAttributeValues: marshall({
+        ":true": true,
+      }),
+    };
+    await dynamoDB.send(new UpdateItemCommand(updateUserParams));
 
     // Remove used token
-   // await verificationToken.deleteOne();
+    const deleteTokenParams = {
+      TableName: VERIFICATION_TOKENS_TABLE,
+      Key: marshall({ token }),
+    };
+    await dynamoDB.send(new DeleteItemCommand(deleteTokenParams));
 
     res.send({ message: "Email verified successfully!" });
   } catch (error) {
@@ -109,46 +151,55 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-
-
+// Login Function
 exports.login = async (req, res) => {
   try {
     const { rollNumber, password } = req.body;
 
-    // Check if both fields are provided
     if (!rollNumber || !password) {
       return res.status(400).send({ message: "Roll number and password are required" });
     }
 
-    // Find user by roll number
-    const user = await User.findOne({ rollNumber });
-    if (!user) {
-      return res.status(401).send({ message: "Invalid credentials" }); // Roll number not found
+    const userParams = {
+      TableName: USERS_TABLE,
+      IndexName: "rollNumberIndex",
+      KeyConditionExpression: "rollNumber = :rollNumber",
+      ExpressionAttributeValues: marshall({
+        ":rollNumber": rollNumber,
+      }),
+      //ProjectionExpression: "userId, name, role, isVerified",
+    };
+    const userData = await dynamoDB.send(new QueryCommand(userParams));
+
+    if (userData.Items.length === 0) {
+      return res.status(401).send({ message: "Invalid credentials" });
     }
 
-    // Check if password matches
+    const user = unmarshall(userData.Items[0]);
+    console.log("User object retrieved from DynamoDB:", user);
+
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(401).send({ message: "Invalid credentials" }); // Incorrect password
+      return res.status(401).send({ message: "Invalid credentials" });
     }
 
-    // Check if the user's email is verified
     if (!user.isVerified) {
       return res.status(403).send({ message: "Please verify your email before logging in." });
     }
 
-    // Generate JWT token
     const token = jwt.sign(
-      { userRollNumber: user.rollNumber, userName: user.name, studentId: user._id, userRole: user.role },
+      { userId: user.userId,userRollnumber: user.rollNumber, userName: user.name, userRole: user.role },
       "secret_key_of_cms",
       { expiresIn: "1h" }
     );
 
-    // Return success response
+    const decodedToken = jwt.decode(token); // Debugging to check token payload
+    console.log("Decoded token in login:", decodedToken);
+
     res.status(200).send({ message: "Login successful", token });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).send({ message: "Login failed due to server error", error });
   }
 };
-

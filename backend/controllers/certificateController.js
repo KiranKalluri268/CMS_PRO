@@ -1,81 +1,207 @@
-const Certificate = require("../models/Certificate");
-const Year = require("../models/Year");
-const User = require("../models/User");
-const fs = require("fs");
-const path = require("path");
+const cloudinary = require('cloudinary').v2;
+const {
+  uploadFile,
+  getResource,
+  deleteResource,
+} = require("../util/cloudinary");
+const {
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+} = require('@aws-sdk/lib-dynamodb');
+const {QueryCommand, DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
-// Helper function to delete a file if it exists
-const deleteFileIfExists = (filePath) => {
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    console.log("File deleted successfully:", filePath);
-  }
-};
+const dynamoDB = new DynamoDBClient({ region: process.env.AWS_REGION });
 
-// Controller to update a certificate
+const USERS_TABLE = process.env.USERS_TABLE || "Users";
+const YEARS_TABLE = process.env.YEARS_TABLE || "Years";
+const CERTIFICATES_TABLE = process.env.CERTIFICATES_TABLE || "Certificates";
+
+// Update a certificate
 exports.updateCertificate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { organisation, course, fromDate, toDate } = req.body;
+    const updatedFields = req.body; // Get all fields to update from the request body
 
-    // Find the existing certificate
-    const certificate = await Certificate.findById(id);
-    if (!certificate) {
-      return res.status(404).json({ msg: "Certificate not found" });
+    // Fetch existing certificate from DynamoDB
+    const existingCertificateResponse = await dynamoDB.send(
+      new GetCommand({
+        TableName: CERTIFICATES_TABLE,
+        Key: { certificateId: id },
+      })
+    );
+
+    if (!existingCertificateResponse.Item) {
+      return res.status(404).json({ message: "Certificate not found." });
     }
 
-    // Update fields
-    certificate.organisation = organisation;
-    certificate.course = course;
-    certificate.fromDate = fromDate;
-    certificate.toDate = toDate;
+    const existingCertificate = unmarshall(existingCertificateResponse.Item);
 
-    // Handle file upload if provided
+    let pdfId = existingCertificate.pdfId;
+    let downloadLink = existingCertificate.downloadLink;
+
+    // Replace existing PDF in Cloudinary if a new file is uploaded
     if (req.file) {
-      console.log("New file uploaded:", req.file.filename);
-
-      // Delete the old file if it exists
-      if (certificate.pdf) {
-        const oldFilePath = path.join(__dirname, "..", certificate.pdf);
-        deleteFileIfExists(oldFilePath);
+      if (pdfId) {
+        console.log("Deleting existing PDF from Cloudinary:", pdfId);
+        await deleteResource(pdfId);
       }
-      certificate.pdf = `uploads/${req.file.filename}`;
+
+      console.log("Uploading new PDF to Cloudinary...");
+      const metadata = {
+        studentId: existingCertificate.studentId,
+        organisation: updatedFields.organisation || existingCertificate.organisation,
+        course: updatedFields.course || existingCertificate.course,
+        fromDate: updatedFields.fromDate || existingCertificate.fromDate,
+        toDate: updatedFields.toDate || existingCertificate.toDate,
+      };
+
+      const uploadResponse = await uploadFile(req.file.buffer, metadata);
+      pdfId = String(uploadResponse.public_id);
+      downloadLink = uploadResponse.secure_url;
     }
 
-    await certificate.save();
+    // Dynamically build update expression and values based on provided fields
+    const updateFields = [];
+    const updateValues = {};
+    const expressionAttributeNames = {};
 
-    res.status(200).json({ message: "Certificate updated successfully", certificate });
+    // Loop through each field in the request body and build the update expression
+    for (const [key, value] of Object.entries(updatedFields)) {
+      if (value) {
+        const placeholder = `#${key}`;
+        updateFields.push(`${placeholder} = :${key}`);
+        updateValues[`:${key}`] = value;
+        expressionAttributeNames[placeholder] = key;
+      }
+    }
+
+    // Always update the pdfId and downloadLink
+    if (pdfId) {
+      updateFields.push('#pdfId = :pdfId');
+      updateValues[':pdfId'] = pdfId;
+      expressionAttributeNames['#pdfId'] = 'pdfId';
+    }
+    if (downloadLink) {
+      updateFields.push('#downloadLink = :downloadLink');
+      updateValues[':downloadLink'] = downloadLink;
+      expressionAttributeNames['#downloadLink'] = 'downloadLink';
+    }
+
+    // Ensure there's something to update
+    if (updateFields.length === 0) {
+      return res.status(400).json({ message: "No fields provided for update." });
+    }
+
+    // Execute the update command
+    const updateCommand = new UpdateCommand({
+      TableName: CERTIFICATES_TABLE,
+      Key: { certificateId: id },
+      UpdateExpression: `SET ${updateFields.join(', ')}`,
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: marshall(updateValues),
+      ReturnValues: "ALL_NEW", // Return the updated item
+    });
+
+    const updatedCertificateResponse = await dynamoDB.send(updateCommand);
+    const updatedCertificate = unmarshall(updatedCertificateResponse.Attributes);
+
+    res.status(200).json({
+      message: "Certificate updated successfully.",
+      certificate: updatedCertificate,
+    });
   } catch (error) {
     console.error("Error updating certificate:", error);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
-// Controller to fetch certificates for a specific student
+// Fetch certificates for a specific student
 exports.getCertificatesByStudent = async (req, res) => {
-  try {
-    // Find student by ID
-    const student = await User.findById(req.params.id);
+  const studentId = req.studentId;
 
-    if (!student) {
-      return res.status(404).json({ msg: "Student not found" });
+  try {
+    const response = await dynamoDB.send(
+      new QueryCommand({
+        TableName: CERTIFICATES_TABLE,
+        IndexName: "studentId-index",
+        KeyConditionExpression: "studentId = :studentId",
+        ExpressionAttributeValues: marshall({
+          ":studentId": studentId,
+        }),
+      })
+    );
+
+    const certificates = response.Items.map(item => unmarshall(item));
+
+    if (certificates.length === 0) {
+      return res.status(404).json({ message: "No certificates found for this student." });
     }
 
-    // Fetch certificates for the student
-    const certificates = await Certificate.find({ student: student._id });
-
-    // Add pdfUrl to each certificate if the PDF exists
-    const certificatesWithUrls = certificates.map((cert) => ({
-      ...cert.toObject(),
-      pdfUrl: cert.pdf ? `${req.protocol}://${req.get("host")}/${cert.pdf.replace(/\\/g, "/")}` : null,
-    }));
-    
-    // Respond with certificates including pdfUrl
-    console.log('certificates found:',certificatesWithUrls);
-    res.status(200).json(certificatesWithUrls);
+    res.status(200).json(certificates);
   } catch (error) {
     console.error("Error fetching certificates:", error);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Function to fetch certificates for a student from Cloudinary
+const getCertificatesFromCloudinary = async (studentId) => {
+  try {
+    const resources = await getAllResourcesFromCloudinary();
+
+    console.log("Total resources fetched:", resources.length);
+
+    // Filter resources by studentId
+    const certificates = resources.filter(resource => {
+      const context = resource.context?.custom;
+
+      if (!context) {
+        console.warn("Resource missing metadata:", resource.public_id);
+        return false;
+      }
+
+      console.log(`Checking resource ${resource.public_id}:`, context);
+
+      return context.studentId === studentId;
+    });
+
+    // Map the filtered resources to return necessary data
+    return certificates.map(resource => ({
+      metadata: resource.context.custom,
+      pdfUrl: resource.secure_url,
+    }));
+  } catch (error) {
+    console.error("Error fetching certificates from Cloudinary:", error);
+    throw new Error("Error fetching certificates");
+  }
+};
+
+// Function to fetch all resources (certificates) from Cloudinary
+const getAllResourcesFromCloudinary = async () => {
+  try {
+    let resources = [];
+    let nextCursor = null;
+
+    do {
+      const response = await cloudinary.api.resources({
+        type: 'upload',
+        max_results: 500, // Fetch up to 500 resources at a time
+        context: true,    // Include metadata in the response
+        next_cursor: nextCursor, // Use cursor for pagination, if applicable
+      });
+
+      resources = resources.concat(response.resources || []);
+      nextCursor = response.next_cursor; // Update the cursor for the next page
+    } while (nextCursor); // Continue until no more pages are left
+
+    console.log("Fetched resources from Cloudinary:", resources.length);
+    return resources;
+  } catch (error) {
+    console.error("Error fetching resources from Cloudinary:", error);
+    throw new Error("Error fetching resources from Cloudinary");
   }
 };
 
@@ -84,85 +210,126 @@ exports.uploadCertificate = async (req, res) => {
   try {
     const { organisation, course, fromDate, toDate, certificateLink } = req.body;
 
-    // Validate that at least one of PDF or certificate link is provided
+    // Check if at least one of `req.file` or `certificateLink` is provided
     if (!req.file && !certificateLink) {
       return res.status(400).json({ message: "Please provide either a PDF or a certificate link." });
     }
 
-    const parsedFromDate = new Date(fromDate);
-    const parsedToDate = new Date(toDate);
-
-    // Helper function to calculate academic years
-    const getAcademicYears = (start, end) => {
-      const years = [];
-      let currentYearStart = new Date(start.getFullYear(), 5, 1); // June 1 of the start year
-      while (currentYearStart <= end) {
-        const nextYearEnd = new Date(currentYearStart.getFullYear() + 1, 4, 31); // May 31 of the next year
-        years.push(`${currentYearStart.getFullYear()}-${currentYearStart.getFullYear() + 1}`);
-        currentYearStart = new Date(currentYearStart.getFullYear() + 1, 5, 1); // Move to next academic year start
-      }
-      return years;
+    const metadata = {
+      studentId: req.studentId?.toString() || "",
+      organisation: organisation || "",
+      course: course || "",
+      fromDate: fromDate?.toString() || "",
+      toDate: toDate?.toString() || "",
     };
 
-    const academicYears = getAcademicYears(parsedFromDate, parsedToDate);
+    let pdfId = null;
+    let downloadLink = null;
 
-    // Create a new certificate entry
-    const certificate = new Certificate({
+    // Upload the PDF if provided
+    if (req.file) {
+      const uploadResponse = await uploadFile(req.file.buffer, metadata);
+      pdfId = String(uploadResponse.public_id); // Ensure pdfId is a string
+      downloadLink = uploadResponse.secure_url;
+      console.log("Uploaded PDF with Cloudinary public_id:", pdfId);
+    }
+
+    console.log("Item being sent to DynamoDB:", {
+      certificateId: pdfId || null, // Use `null` if no PDF is uploaded
+      studentId: metadata.studentId,
       organisation,
       course,
       fromDate,
       toDate,
-      ...(req.file && { pdf: req.file.path }),
-      certificateLink,
-      student: req.studentId,
+      downloadLink: downloadLink || null, // Use `null` if no PDF is uploaded
+      certificateLink: certificateLink || "", // Optional link from frontend
     });
 
-    // Process academic years
-    const yearIds = [];
+    // Store certificate in the Certificates table
+    await dynamoDB.send(new PutCommand({
+      TableName: CERTIFICATES_TABLE,
+      Item: {
+        certificateId : pdfId || `cert-${Date.now()}`,
+        studentId: metadata.studentId,
+        organisation,
+        course,
+        fromDate,
+        toDate,
+        ...(downloadLink ? { downloadLink: downloadLink } : {}), // Include only if downloadLink exists
+        ...(certificateLink ? { certificateLink: certificateLink } : {}), // Include only if certificateLink exists
+      },
+    }));
+
+    const academicYears = getAcademicYears(new Date(fromDate), new Date(toDate));
     for (const year of academicYears) {
-      let academicYear = await Year.findOne({ year });
-      if (!academicYear) {
-        academicYear = new Year({ year, certificates: [] });
-        await academicYear.save();
-      }
+      console.log("Processing year:", year);
 
-      if (!academicYear.certificates.includes(certificate._id)) {
-        academicYear.certificates.push(certificate._id);
-        await academicYear.save();
-      }
+      // Fetch the year record
+      const yearRecord = await dynamoDB.send(new GetCommand({
+        TableName: YEARS_TABLE,
+        Key: { year: year },
+      }));
 
-      yearIds.push(academicYear._id);
+      if (!yearRecord.Item) {
+        // Create a new year if it doesn't exist
+        console.log("Year not found, creating new year record:", year);
+        await dynamoDB.send(new PutCommand({
+          TableName: YEARS_TABLE,
+          Item: {
+            year: year,
+            certificates: [pdfId].filter(Boolean), // Add pdfId only if it exists
+          },
+        }));
+      } else {
+        const existingData = yearRecord.Item;
+        if (pdfId) {
+          const updatedCertificates = existingData.certificates || [];
+          if (!updatedCertificates.includes(pdfId)) {
+            updatedCertificates.push(pdfId);
+        
+            await dynamoDB.send(new UpdateCommand({
+              TableName: YEARS_TABLE,
+              Key: { year: year },
+              UpdateExpression: "SET certificates = :certificates",
+              ExpressionAttributeValues: {
+                ":certificates": updatedCertificates,
+              },
+            }));
+          }
+        }
+      }
     }
 
-    // Update certificate with academic years
-    certificate.year = yearIds;
-    await certificate.save();
-
-    res.status(201).json({ certificate });
+    res.status(201).json({ message: "Certificate uploaded successfully", pdfId });
   } catch (error) {
     console.error("Error uploading certificate:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+
 // Controller to get a certificate by ID
 exports.getCertificateById = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("Fetching certificate details for ID:",id);
 
-    if (!id) {
-      return res.status(400).json({ msg: "No ID provided" });
-    }
+    const response = await dynamoDB.send(
+      new GetCommand({
+        TableName: CERTIFICATES_TABLE,
+        Key: ({ certificateId: id }),
+      })
+    );
 
-    const certificate = await Certificate.findById(id);
-
-    if (!certificate) {
+    if (!response.Item) {
       return res.status(404).json({ msg: "Certificate not found" });
     }
 
+    const certificate = (response.Item);
+    console.log("Fetched Certificate:",certificate);
     res.status(200).json(certificate);
   } catch (error) {
-    console.error("Error fetching certificate:", error);
+    console.error("Error fetching certificate by ID:", error);
     res.status(500).json({ msg: "Server error" });
   }
 };
@@ -177,10 +344,8 @@ exports.deleteCertificate = async (req, res) => {
       return res.status(404).json({ msg: "Certificate not found" });
     }
 
-    // Delete the associated PDF file if it exists
     if (certificate.pdf) {
-      const filePath = path.join(__dirname, "..", certificate.pdf);
-      deleteFileIfExists(filePath);
+      await deleteResource(certificate.pdf);
     }
 
     res.status(200).json({ message: "Certificate deleted successfully" });
@@ -188,4 +353,15 @@ exports.deleteCertificate = async (req, res) => {
     console.error("Error deleting certificate:", error);
     res.status(500).json({ msg: "Server error" });
   }
+};
+
+// Utility function to calculate academic years
+const getAcademicYears = (start, end) => {
+  const years = [];
+  let currentYearStart = new Date(start.getFullYear(), 5, 1);
+  while (currentYearStart <= end) {
+    years.push(`${currentYearStart.getFullYear()}-${currentYearStart.getFullYear() + 1}`);
+    currentYearStart = new Date(currentYearStart.getFullYear() + 1, 5, 1);
+  }
+  return years;
 };

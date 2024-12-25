@@ -36,7 +36,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
     try {
       const token = localStorage.getItem("authToken");
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
-      const studentId = decodedToken.studentId;
+      const studentId = decodedToken.userId;
 
       await uploadCertificate(data, token);
       alert("Certificate uploaded successfully");

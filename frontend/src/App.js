@@ -27,7 +27,7 @@ function App() {
         <Route path="/admin-home" element={<AdminHome />} />
         <Route path="/add-certificate" element={<AddCertificate />} />
         <Route path="/edit-certificate/:id" element={<EditCertificate/>} />
-        <Route path="/admin-report/:batchId/:batchYear" element={<AdminReport/>} />
+        <Route path="/admin-report/:batchYear" element={<AdminReport/>} />
         <Route path="/verify-email" element={<VerifyEmail/>} />
       </Routes>
     </Router>

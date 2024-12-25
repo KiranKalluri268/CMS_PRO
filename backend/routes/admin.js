@@ -7,6 +7,6 @@ const { authenticate, adminOnly } = require("../middleware/authMiddleware");
 router.get("/batches", authenticate, adminOnly, getBatches);
 
 // Route to fetch certificates for a specific batch (Admin only)
-router.get("/batches/:batchId/certificates", authenticate, adminOnly, getCertificatesByBatch);
+router.get("/certificates", authenticate, adminOnly, getCertificatesByBatch);
 
 module.exports = router;

@@ -31,8 +31,8 @@ const AdminHome = () => {
     fetchBatches();
   }, []);
 
-  const handleBatchSelect = (batchId, batchYear) => {
-    navigate(`/admin-report/${batchId}/${batchYear}`);
+  const handleBatchSelect = ( batchYear) => {
+    navigate(`/admin-report/${batchYear}`);
   };
 
   const handleLogout = () => {
@@ -60,8 +60,8 @@ const AdminHome = () => {
         {batches.length > 0 ? (
           <ul>
             {batches.map((batch) => (
-              <li key={batch._id}>
-              <button onClick={() => handleBatchSelect(batch._id, batch.year)}>
+              <li key={batch.year}>
+              <button onClick={() => handleBatchSelect(batch.year)}>
               {batch.year}
               </button>
               </li>

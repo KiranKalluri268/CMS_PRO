@@ -9,14 +9,8 @@ const {
 const authMiddleware = require("../middleware/authMiddleware");
 const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+const storage = multer.memoryStorage();
+
 const upload = multer({ storage });
 const router = express.Router();
 
@@ -35,4 +29,4 @@ router.put("/certificates/:id", upload.single("pdf"), updateCertificate);
 // Route to delete a certificate by ID
 router.delete("/certificates/:id", authMiddleware.authenticate, deleteCertificate);
 
-module.exports = router;
+module.exports = router,upload;

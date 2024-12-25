@@ -11,17 +11,17 @@
 }
 
 /* Header styling */
-.header {
-  background-color: #fdfdfd; /* Change to your desired background color */
+/* .header {
+  background-color: #000000; 
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
-  position: fixed; /* Fix the header at the top */
+  position: static; 
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* Ensure the header stays above content */
-}
+  z-index: 1000; 
+} */
 
 .header-logo {
   max-width: 100px; /* Adjust the size of the logo */
