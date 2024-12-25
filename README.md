@@ -28,7 +28,6 @@ Make sure you have the following installed:
    npm install
    cd ../backend
    npm install
-   mkdir uploads
    cd ..
    ```
 
