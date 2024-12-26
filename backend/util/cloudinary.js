@@ -20,8 +20,8 @@ exports.uploadFile = async (fileBuffer, metadata, publicId = null) => {
         resource_type: "raw",
         context: validatedMetadata,
         tags: validatedMetadata,
-        public_id: publicId || `certificates_${validatedMetadata.studentId}-${Date.now()}`, // Use the provided publicId or generate a new one
-        overwrite: true, // Ensure the old file is replaced
+        public_id: publicId || `certificates_${validatedMetadata.studentId}-${Date.now()}`, 
+        overwrite: true,
       };
 
       const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {

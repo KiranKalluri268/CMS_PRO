@@ -8,6 +8,7 @@ const {
   GetCommand,
   PutCommand,
   UpdateCommand,
+  DeleteCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const {QueryCommand, DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
@@ -139,65 +140,6 @@ exports.getCertificatesByStudent = async (req, res) => {
   } catch (error) {
     console.error("Error fetching certificates:", error);
     res.status(500).json({ message: "Server error" });
-  }
-};
-
-
-// Function to fetch certificates for a student from Cloudinary
-const getCertificatesFromCloudinary = async (studentId) => {
-  try {
-    const resources = await getAllResourcesFromCloudinary();
-
-    console.log("Total resources fetched:", resources.length);
-
-    // Filter resources by studentId
-    const certificates = resources.filter(resource => {
-      const context = resource.context?.custom;
-
-      if (!context) {
-        console.warn("Resource missing metadata:", resource.public_id);
-        return false;
-      }
-
-      console.log(`Checking resource ${resource.public_id}:`, context);
-
-      return context.studentId === studentId;
-    });
-
-    // Map the filtered resources to return necessary data
-    return certificates.map(resource => ({
-      metadata: resource.context.custom,
-      pdfUrl: resource.secure_url,
-    }));
-  } catch (error) {
-    console.error("Error fetching certificates from Cloudinary:", error);
-    throw new Error("Error fetching certificates");
-  }
-};
-
-// Function to fetch all resources (certificates) from Cloudinary
-const getAllResourcesFromCloudinary = async () => {
-  try {
-    let resources = [];
-    let nextCursor = null;
-
-    do {
-      const response = await cloudinary.api.resources({
-        type: 'upload',
-        max_results: 500, // Fetch up to 500 resources at a time
-        context: true,    // Include metadata in the response
-        next_cursor: nextCursor, // Use cursor for pagination, if applicable
-      });
-
-      resources = resources.concat(response.resources || []);
-      nextCursor = response.next_cursor; // Update the cursor for the next page
-    } while (nextCursor); // Continue until no more pages are left
-
-    console.log("Fetched resources from Cloudinary:", resources.length);
-    return resources;
-  } catch (error) {
-    console.error("Error fetching resources from Cloudinary:", error);
-    throw new Error("Error fetching resources from Cloudinary");
   }
 };
 
@@ -335,13 +277,72 @@ exports.deleteCertificate = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const certificate = await Certificate.findByIdAndDelete(id);
+    // Fetch the existing certificate from the Certificates table
+    const certificateResponse = await dynamoDB.send(
+      new GetCommand({
+        TableName: process.env.CERTIFICATES_TABLE,
+        Key: { certificateId: id },
+      })
+    );
+
+    const certificate = certificateResponse.Item;
+
     if (!certificate) {
       return res.status(404).json({ msg: "Certificate not found" });
     }
+    console.log("deleting certificate:",certificate);
 
-    if (certificate.pdf) {
-      await deleteResource(certificate.pdf);
+    // Delete the certificate PDF from Cloudinary if it exists
+    if (certificate.certificateId) {
+      console.log("Deleting certificate PDF from Cloudinary:", certificate.certificateId);
+      await deleteResource(certificate.certificateId);
+    }
+
+    // Delete the certificate entry from the Certificates table
+    await dynamoDB.send(
+      new DeleteCommand({
+        TableName: process.env.CERTIFICATES_TABLE,
+        Key: { certificateId: id },
+      })
+    );
+
+    // Calculate the academic years using the fromDate and toDate
+    const fromDate = new Date(certificate.fromDate);
+    const toDate = new Date(certificate.toDate);
+    const academicYears = getAcademicYears(fromDate, toDate);
+
+    // Remove the certificate ID from the Years table for all relevant years
+    for (const year of academicYears) {
+      const yearKey = { year }; // Assuming the key in the Years table is 'year'
+
+      // Fetch the current item from the Years table
+      const yearItemResponse = await dynamoDB.send(
+        new GetCommand({
+          TableName: process.env.YEARS_TABLE,
+          Key: yearKey,
+        })
+      );
+
+      const yearItem = yearItemResponse.Item;
+
+      if (yearItem && yearItem.certificates) {
+        // Remove the certificate ID from the list
+        const updatedCertificates = yearItem.certificates.filter(
+          (certId) => certId !== id
+        );
+
+        // Update the Years table with the new list
+        await dynamoDB.send(
+          new UpdateCommand({
+            TableName: process.env.YEARS_TABLE,
+            Key: yearKey,
+            UpdateExpression: "SET certificates = :certificates",
+            ExpressionAttributeValues: {
+              ":certificates": updatedCertificates,
+            },
+          })
+        );
+      }
     }
 
     res.status(200).json({ message: "Certificate deleted successfully" });
