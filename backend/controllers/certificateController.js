@@ -36,19 +36,15 @@ exports.updateCertificate = async (req, res) => {
       return res.status(404).json({ message: "Certificate not found." });
     }
 
-    const existingCertificate = unmarshall(existingCertificateResponse.Item);
+    const existingCertificate = (existingCertificateResponse.Item);
 
     let pdfId = existingCertificate.pdfId;
     let downloadLink = existingCertificate.downloadLink;
 
     // Replace existing PDF in Cloudinary if a new file is uploaded
     if (req.file) {
-      if (pdfId) {
-        console.log("Deleting existing PDF from Cloudinary:", pdfId);
-        await deleteResource(pdfId);
-      }
+      console.log("Replacing existing PDF in Cloudinary...");
 
-      console.log("Uploading new PDF to Cloudinary...");
       const metadata = {
         studentId: existingCertificate.studentId,
         organisation: updatedFields.organisation || existingCertificate.organisation,
@@ -57,7 +53,7 @@ exports.updateCertificate = async (req, res) => {
         toDate: updatedFields.toDate || existingCertificate.toDate,
       };
 
-      const uploadResponse = await uploadFile(req.file.buffer, metadata);
+      const uploadResponse = await uploadFile(req.file.buffer, metadata, pdfId);
       pdfId = String(uploadResponse.public_id);
       downloadLink = uploadResponse.secure_url;
     }
@@ -100,12 +96,12 @@ exports.updateCertificate = async (req, res) => {
       Key: { certificateId: id },
       UpdateExpression: `SET ${updateFields.join(', ')}`,
       ExpressionAttributeNames: expressionAttributeNames,
-      ExpressionAttributeValues: marshall(updateValues),
+      ExpressionAttributeValues: (updateValues),
       ReturnValues: "ALL_NEW", // Return the updated item
     });
 
     const updatedCertificateResponse = await dynamoDB.send(updateCommand);
-    const updatedCertificate = unmarshall(updatedCertificateResponse.Attributes);
+    const updatedCertificate = (updatedCertificateResponse.Attributes);
 
     res.status(200).json({
       message: "Certificate updated successfully.",

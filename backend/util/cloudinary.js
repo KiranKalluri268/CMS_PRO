@@ -9,27 +9,27 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-exports.uploadFile = async (fileBuffer, metadata) => {
+exports.uploadFile = async (fileBuffer, metadata, publicId = null) => {
   try {
     const validatedMetadata = Object.fromEntries(
       Object.entries(metadata).map(([key, value]) => [key, value?.toString() || ""])
     );
 
     return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          resource_type: "raw",
-          public_id: `certificates_${validatedMetadata.studentId}-${Date.now()}`,
-          tags: validatedMetadata,
-          context: validatedMetadata,
-        },
-        (error, result) => {
-          if (error) {
-            return reject(error);
-          }
-          resolve(result);
+      const options = {
+        resource_type: "raw",
+        context: validatedMetadata,
+        tags: validatedMetadata,
+        public_id: publicId || `certificates_${validatedMetadata.studentId}-${Date.now()}`, // Use the provided publicId or generate a new one
+        overwrite: true, // Ensure the old file is replaced
+      };
+
+      const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+        if (error) {
+          return reject(error);
         }
-      );
+        resolve(result);
+      });
 
       uploadStream.end(fileBuffer);
     });
