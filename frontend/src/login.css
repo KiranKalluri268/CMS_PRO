@@ -1,116 +1,139 @@
-/* login.css */
-
 /* Center the entire container on the page */
 .login-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 90vh; /* Full viewport height to center the box */
-    background-color: #f7f1f1;
-    margin: 0;
-  }
-  
-  /* Header styling */
-  .header {
-    background-color: hsla(0, 22%, 93%, 0.897) !important;
-  }
- 
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 90vh; /* Full viewport height to center the box */
+  background-color: #f7f1f1;
+  margin: 0;
+}
+
+.LoginHeader-logo {
+  width: 100%;  /* Ensure the image takes up full width of the header */
+  height: auto; /* Maintain aspect ratio */
+  max-width: 650px; /* Set a max width for large screens */
+  object-fit: contain; /* Ensure the image fits without distortion */
+}
+
+/* Login form box */
+.login-box {
+  background-color: #dfdddd;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Form elements */
+.input-group {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Label styling */
+.input-group label {
+  display: inline-block;
+  width: 80px;
+  font-size: 14px;
+  margin-right: 10px;
+  color: #7e7676;
+  text-align: right;
+}
+
+/* Input fields */
+.input-group input,
+.input-group select {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Login button */
+.login-box button {
+  width: 30%;
+  padding: 10px;
+  background-color: #e6bd39a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* Hover effect on button */
+.login-box button:hover {
+  background-color: #970f0f;
+}
+
+/* Heading styling */
+.login-box h1 {
+  font-size: 24px;
+  margin-top: 0px;
+  margin-bottom: 30px;
+}
+
+/* Footer styling */
+.footer {
+  width: 100%;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  bottom: 0;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
   .LoginHeader-logo {
-    max-width: auto; /* Adjust the size of the logo */
-    height: 150px;
-  }
-  
-  .login-title {
-    color: #970f0f;
+    max-width: 450px; /* Reduce size for smaller screens */
   }
 
-  /* Style the box that contains the form */
   .login-box {
-    background-color: #dfdddd;
-    padding: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 72%; /* Reduce the width for smaller screens */
+    padding: 20px;
   }
-  
-  /* Style the form elements */
-  .input-group {
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  /* Style the labels */
-  .input-group label {
-    display: inline-block;
-    width: 80px; /* Adjust width to fit label */
-    font-size: 14px;
-    margin-right: 10px;
-    color: #7e7676;
-    text-align: right;
-  }
-  
-  /* Style the input fields */
-  .input-group input,
-  .input-group select {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-  }
-  
-  /* Style the submit button */
-  .login-box button {
-    width: 30%;
-    padding: 10px;
-    background-color: #e6bd39a8;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-  }
-  
-  /* Add hover effect to the button */
-  .login-box button:hover {
-    background-color: #970f0f;;
-  }
-  
-  /* Style the heading */
+
   .login-box h1 {
-    font-size: 24px;
-    margin-top: 0px;
-    margin-bottom: 30px;
+    font-size: 20px;
   }
-  
-  /* Footer styling */
-  .footer {
-    width: 100%;
-    background-color: #333; /* Dark background color */
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: absolute;
-    bottom: 0;
+
+  .login-box button {
+    width: 30%; /* Adjust button width for smaller screens */
   }
-  
-  .footer p {
-    margin: 0;
-    font-size: 14px;
+}
+
+/* Tablet responsiveness */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .login-box {
+    width: 30%; /* Allow more space on tablets */
   }
-  
-  
+
+  .login-box h1 {
+    font-size: 22px;
+  }
+
+  .login-box button {
+    width: 30%; /* Adjust button size for tablets */
+  }
+}

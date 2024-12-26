@@ -5,7 +5,7 @@ import * as XLSX from "xlsx"; // Import XLSX library
 import "../adminreport.css";
 
 const AdminReport = () => {
-  const { batchYear } = useParams(); // Get batchId from URL params
+  const { batchYear } = useParams(); // Get batchYear from URL params
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
   const [academicYear, setAcademicYear] = useState(""); // State for filtering by academic year
@@ -13,7 +13,7 @@ const AdminReport = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); // or sessionStorage.getItem('authToken')
+    const token = localStorage.getItem("authToken");
     if (!token) {
       navigate("/");
     }
@@ -25,35 +25,33 @@ const AdminReport = () => {
         const response = await axios.get(`/api/admin/certificates?year=${batchYear}`, {
           headers: { "x-auth-token": localStorage.getItem("authToken") },
         });
-    
-        console.log("Response data:", response.data); // Log the response to check structure
-    
-        // Ensure response.data is an array before proceeding
-    const certificates = Array.isArray(response.data.certificates) ? response.data.certificates : [];
 
-    // Sort the certificates by toDate
-    const sortedCertificates = certificates.sort((a, b) => {
-      const dateA = new Date(a.toDate);
-      const dateB = new Date(b.toDate);
+        const certificates = Array.isArray(response.data.certificates) ? response.data.certificates : [];
+        const sortedCertificates = certificates.sort((a, b) => {
+          const dateA = new Date(a.toDate);
+          const dateB = new Date(b.toDate);
+          if (isNaN(dateA)) return 1;
+          if (isNaN(dateB)) return -1;
+          return dateA - dateB;
+        });
 
-      // Handle invalid or missing dates
-      if (isNaN(dateA)) return 1;
-      if (isNaN(dateB)) return -1;
-
-      return dateA - dateB;
-    });
-    
         setCertificates(sortedCertificates);
         setFilteredCertificates(sortedCertificates);
-    
-        // Populate academic years dynamically
-        const uniqueYears = [...new Set(sortedCertificates.map(certificate => new Date(certificate.toDate).getFullYear()))];
+
+        const uniqueYears = [...new Set(sortedCertificates.map(c => new Date(c.toDate).getFullYear()))];
         setYears(uniqueYears);
       } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Token expired or authentication error
+          alert("Session expired. Please log in again.");
+          localStorage.removeItem("authToken"); // Clear the token
+          navigate("/"); // Redirect to login page
+        } else {
         console.error("Error fetching certificates:", error);
+        }
       }
     };
-    
+
     fetchCertificates();
   }, [batchYear]);
 
@@ -77,29 +75,25 @@ const AdminReport = () => {
       alert("No download link available.");
       return;
     }
-  
-    // Ensure the filename ends with .pdf
-    const fileNameWithExtension = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
-  
+
+    const fileNameWithExtension = fileName.endsWith(".pdf") ? fileName : `${fileName}.pdf`;
+
     try {
-      // Fetch the file as a blob
       const response = await fetch(downloadLink);
       if (!response.ok) {
-        throw new Error('Failed to fetch the file.');
+        throw new Error("Failed to fetch the file.");
       }
       const blob = await response.blob();
-  
-      // Create a download link with the blob
+
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = fileNameWithExtension;
-  
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  
-      // Revoke the object URL
+
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading file:', error);
@@ -107,20 +101,13 @@ const AdminReport = () => {
     }
   };
 
-  const handleCertificateLinkClick = (certificateLink) => {
-    if (certificateLink) {
-      window.open(certificateLink, "_blank");
-    } else {
-      alert("No link available for this certificate.");
-    }
-  };
 
   const handleDownloadExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
       filteredCertificates.map((certificate, index) => ({
         SNo: index + 1,
         RollNo: certificate.student.rollNumber,
-        Name: certificate.studentId.name,
+        Name: certificate.student.name,
         Organisation: certificate.organisation,
         Course: certificate.course,
         FromDate: new Date(certificate.fromDate).toLocaleDateString(),
@@ -147,7 +134,7 @@ const AdminReport = () => {
         <img
           src="/images/logout-icon.png"
           alt="Logout"
-          style={{ cursor: "pointer", width: "60px", height: "60px" }}
+          className="AdminReportLogoout-logo"
           onClick={handleLogout}
         />
       </header>
@@ -174,50 +161,45 @@ const AdminReport = () => {
         </button>
 
         {filteredCertificates.length > 0 ? (
-          <table className="certificate-table">
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Roll No</th>
-                <th>Name</th>
-                <th>Organisation</th>
-                <th>Course</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Academic Year</th>
-                <th>Download</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCertificates.map((certificate, index) => (
-                <tr key={certificate.certificateId}>
-                  <td>{index + 1}</td>
-                  <td>{certificate.student.rollNumber}</td>
-                  <td>{certificate.student.name}</td>
-                  <td>{certificate.organisation}</td>
-                  <td>
-                    <span
-                      style={{ color: certificate.certificateLink ? "blue" : "black", cursor: certificate.certificateLink ? "pointer" : "default" }}
-                      onClick={() => handleCertificateLinkClick(certificate.certificateLink)}
-                    >
-                      {certificate.course}
-                    </span>
-                  </td>
-                  <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
-                  <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
-                  <td>{new Date(certificate.toDate).getFullYear()}</td>
-                  <td>
-                    <button
-                      onClick={() => handleDownload(certificate.downloadLink, `${certificate.course}.pdf`)}
-                      disabled={!certificate.downloadLink}
-                    >
-                      {certificate.downloadLink ? 'Download' : 'No PDF Available'}
-                    </button>
-                  </td>
+          <div className="report-table-wrapper">
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Roll No</th>
+                  <th>Name</th>
+                  <th>Organisation</th>
+                  <th>Course</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Academic Year</th>
+                  <th>Download</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredCertificates.map((certificate, index) => (
+                  <tr key={certificate.certificateId}>
+                    <td>{index + 1}</td>
+                    <td>{certificate.student.rollNumber}</td>
+                    <td>{certificate.student.name}</td>
+                    <td>{certificate.organisation}</td>
+                    <td>{certificate.course}</td>
+                    <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
+                    <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
+                    <td>{new Date(certificate.toDate).getFullYear()}</td>
+                    <td>
+                      <button
+                        onClick={() => handleDownload(certificate.downloadLink, `${certificate.course}.pdf`)}
+                        disabled={!certificate.downloadLink}
+                      >
+                        {certificate.downloadLink ? "Download" : "No PDF Available"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p>No certificates found for this batch.</p>
         )}

@@ -73,7 +73,14 @@ const EditCertificate = () => {
       alert('Certificate updated successfully');
       window.location.href = `/student-home/${studentId}`;
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // Token expired or authentication error
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem("authToken"); // Clear the token
+        navigate("/"); // Redirect to login page
+      } else {
       console.error('Error updating certificate:', error);
+      }
     }
   };
 

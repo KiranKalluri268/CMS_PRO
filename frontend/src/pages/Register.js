@@ -8,31 +8,29 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  try {
-    const response = await axios.post('/api/auth/register', {
-      rollNumber,
-      email,
-      name,
-      password,
-    });
 
-    // Check if response.data exists
-    if (response && response.data) {
-      alert('Registration successful! Please verify your email before logging in.');
-      // You might want to redirect the user to the login page
-      window.location.href = '/';
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('/api/auth/register', {
+        rollNumber,
+        email,
+        name,
+        password,
+      });
+
+      if (response && response.data) {
+        alert('Registration successful! Please verify your email before logging in.');
+        window.location.href = '/';
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert(error.response?.data?.message || 'Registration failed');
     }
-  } catch (error) {
-    console.error('Error during registration:', error);
-    alert(error.response?.data?.message || 'Registration failed');
-  }
-};
+  };
 
   return (
     <div className="register-container">
-      {/* Header Section */}
       <header className="header">
         <img src="/images/vaagdevi.png" alt="Logo" className="RegisterHeader-logo" />
       </header>
@@ -40,21 +38,20 @@ const handleSubmit = async (event) => {
       <div className="register-box">
         <h1 className="register-title">Register</h1>
         <form onSubmit={handleSubmit}>
+        <div className="input-group">
+        <label htmlFor="rollNo">Roll No:</label>
+        <input
+          id="rollNo"
+          type="text"
+          placeholder="Enter your roll number"
+          value={rollNumber}
+          onChange={(e) => setRollNumber(e.target.value)}
+          required
+          pattern="^[0-3][0-9]{1}[0-9]{3}A[0-9]{2}[A-Z][0-9]$"
+          title="Only uppercase letters are allowed in the roll number (e.g., 22641A05G1)."
+        />
+      </div>
 
-          {/* Roll No Input */}
-          <div className="input-group">
-            <label htmlFor="rollNo">Roll No:</label>
-            <input
-              id="rollNo"
-              type="text"
-              placeholder="Enter your roll number"
-              value={rollNumber}
-              onChange={(e) => setRollNumber(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Name Input */}
           <div className="input-group">
             <label htmlFor="name">Name:</label>
             <input
@@ -67,7 +64,6 @@ const handleSubmit = async (event) => {
             />
           </div>
 
-          {/* Email Input */}
           <div className="input-group">
             <label htmlFor="email">Email:</label>
             <input
@@ -80,7 +76,6 @@ const handleSubmit = async (event) => {
             />
           </div>
 
-          {/* Password Input */}
           <div className="input-group">
             <label htmlFor="password">Password:</label>
             <input
@@ -99,7 +94,6 @@ const handleSubmit = async (event) => {
         </form>
       </div>
 
-      {/* Footer Section */}
       <footer className="footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>

@@ -27,7 +27,14 @@ const StudentHome = () => {
         );
         setCertificates(sortedCertificates);
       } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Token expired or authentication error
+          alert("Session expired. Please log in again.");
+          localStorage.removeItem("authToken"); // Clear the token
+          navigate("/"); // Redirect to login page
+        } else {
         console.error('Error fetching certificates:', error);
+        }
       }
     };
     fetchCertificates();
@@ -93,7 +100,7 @@ const StudentHome = () => {
         <img
           src="/images/logout-icon.png"
           alt="Logout"
-          style={{ cursor: 'pointer', width: '60px', height: '60px' }}
+          className='StudentLogout-logo'
           onClick={handleLogout}
         />
       </header>

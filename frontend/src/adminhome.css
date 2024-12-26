@@ -1,73 +1,104 @@
-/* login.css */
-
 /* Center the entire container on the page */
 .admin-home-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh; /* Full viewport height to center the box */
-    background-color: #f7f6f6;
-    margin: 0;
-  }
-  
-  /* Header styling */
-  .header {
-    width: 100%;
-    background-color: #fdfdfd; /* Change to your desired background color */
-    padding: 20px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    position: absolute;
-    top: 0;
-  }
-  
-  .AdminHeader-logo {
-    max-width: auto; /* Adjust the size of the logo */
-    height: 140px;
-  }
-  
-  .batch-title {
-    color: #970f0f;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Full viewport height to center the box */
+  background-color: #f7f6f6;
+  margin: 0;
+}
 
-  /* Style the box that contains the form */
+/* Header styling */
+.header {
+  width: 100%;
+  background-color: #fdfdfd; /* Change to your desired background color */
+  padding: 20px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: absolute;
+  top: 0;
+}
+
+.AdminHeader-logo {
+  max-width: 100%; /* Ensure the logo is responsive */
+  height: auto;
+  max-width: 650px; /* Limit the logo size for smaller screens */
+  object-fit: contain;
+}
+
+/* Title styling */
+.batch-title {
+  color: #970f0f;
+}
+
+/* Style the box that contains the form */
+.batch-list {
+  background-color: #ffffff;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 120px;
+}
+
+/* Add hover effect to the button */
+.batch-list button:hover {
+  background-color: #970f0f;
+}
+
+/* Footer styling */
+.footer {
+  width: 100%;
+  background-color: #333; /* Dark background color */
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  bottom: 0;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Responsive Design for Tablets and Mobile */
+@media (max-width: 768px) {
   .batch-list {
-    background-color: #ffffff;
-    padding: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 90%; /* Make the form width responsive */
+    margin-top: 100px; /* Adjust margin for smaller screens */
   }
 
-  /* Add hover effect to the button */
-  .batch-list button:hover {
-    background-color: #970f0f;
+  .AdminHeader-logo {
+    max-width: 480px; /* Adjust the logo size */
   }
-  
-  /* Footer styling */
+
+  .batch-title {
+    font-size: 18px; /* Decrease title font size for mobile */
+  }
+
+  .batch-list button {
+    width: 100%; /* Make the button full width on mobile */
+    padding: 12px; /* Increase padding for better usability */
+  }
+}
+
+@media (max-width: 480px) {
+  .AdminHeader-logo {
+    max-width: 350px;
+  }
+
+  .batch-list {
+    width: 85%; /* Adjust to fit on smaller screens */
+  }
+
   .footer {
-    width: 100%;
-    background-color: #333; /* Dark background color */
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: absolute;
-    bottom: 0;
+    padding: 15px; /* Make footer padding larger for smaller screens */
   }
-  
-  .footer p {
-    margin: 0;
-    font-size: 14px;
-  }
-  
-  
-  .batch-list ul {
-    background-color: lightgreen;   /* Add background color to list */
-  }
-  
+}

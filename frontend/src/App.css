@@ -1,7 +1,28 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: url('../public/images/Vaagdevi-Logo.png') no-repeat center center fixed;
+  background-size: cover;
+  opacity: 0.9; /* Adjust opacity for watermark effect */
+}
+
+#root {
+  height: 100%; /* Ensures the app takes full height */
+}
+
+.page-container {
+  position: relative; /* Ensures content layers correctly */
+  z-index: 1;
+}
+
+/* Ensuring the layout is flexible */
 .App {
   text-align: center;
 }
 
+/* Adjust logo animation for larger screens */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -37,22 +58,50 @@
   }
 }
 
-/* App.css */
+/* Responsive Styles */
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background: url('../public/images/Vaagdevi-Logo.png') no-repeat center center fixed;
-  background-size: cover;
-  opacity: 0.9; /* Adjust the opacity to make it appear like a watermark */
+/* For mobile devices */
+@media (max-width: 768px) {
+  .App-header {
+    font-size: 18px; /* Adjust font size for mobile */
+    text-align: center;
+    padding: 20px;
+  }
+
+  .App-logo {
+    height: 30vmin; /* Smaller logo size for mobile */
+  }
+
+  /* Adjusting the background for mobile */
+  body {
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Adjusting app content for mobile */
+  .page-container {
+    padding: 10px;
+  }
 }
 
-#root {
-  height: 100%; /* Ensures that your app takes the full height */
+/* For tablet devices (between 768px and 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .App-header {
+    font-size: 22px; /* Adjust font size for tablet */
+  }
+
+  .App-logo {
+    height: 35vmin; /* Adjust logo size for tablet */
+  }
 }
 
-.page-container {
-  position: relative; /* Ensures content is properly layered over the background */
-  z-index: 1;
+/* For desktop devices (1024px and up) */
+@media (min-width: 1024px) {
+  .App-header {
+    font-size: calc(10px + 4vmin); /* Larger font for larger screens */
+  }
+
+  .App-logo {
+    height: 40vmin; /* Keep the original logo size for large screens */
+  }
 }

@@ -25,7 +25,14 @@ const AdminHome = () => {
           console.log("Batches fetched:", response.data); 
         setBatches(response.data.batches);
       } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Token expired or authentication error
+          alert("Session expired. Please log in again.");
+          localStorage.removeItem("authToken"); // Clear the token
+          navigate("/"); // Redirect to login page
+        } else {
         console.error("Error fetching batches:", error);
+        }
       }
     };
     fetchBatches();

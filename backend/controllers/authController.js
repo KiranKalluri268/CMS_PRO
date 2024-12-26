@@ -30,6 +30,36 @@ exports.register = async (req, res) => {
   try {
     const { name, rollNumber, email, password } = req.body;
 
+    // Check if rollNumber already exists
+    const checkRollNumberParams = {
+      TableName: USERS_TABLE,
+      IndexName: 'rollNumberIndex', // GSI for rollNumber
+      KeyConditionExpression: 'rollNumber = :rollNumber',
+      ExpressionAttributeValues: {
+        ':rollNumber': { S: rollNumber },
+      },
+    };
+    const rollNumberResult = await dynamoDB.send(new QueryCommand(checkRollNumberParams));
+
+    if (rollNumberResult.Items && rollNumberResult.Items.length > 0) {
+      return res.status(400).send({ message: 'Roll number already exists.' });
+    }
+
+    // Check if email already exists
+    const checkEmailParams = {
+      TableName: USERS_TABLE,
+      IndexName: 'email-index', // GSI for email
+      KeyConditionExpression: 'email = :email',
+      ExpressionAttributeValues: {
+        ':email': { S: email },
+      },
+    };
+    const emailResult = await dynamoDB.send(new QueryCommand(checkEmailParams));
+
+    if (emailResult.Items && emailResult.Items.length > 0) {
+      return res.status(400).send({ message: 'Email already exists.' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const year = "20" + rollNumber.substring(0, 2);
 
@@ -78,9 +108,12 @@ exports.register = async (req, res) => {
 
     // Create email verification token
     const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const verificationToken = {
       token,
       userId,
+      expiresAt: expiresAt.toISOString(),
+      isUsed: false,
     };
     await addItem(VERIFICATION_TOKENS_TABLE, verificationToken);  // Use addItem function
 
@@ -118,31 +151,48 @@ exports.verifyEmail = async (req, res) => {
       return res.status(400).send({ message: "Invalid or expired token" });
     }
 
+    const { userId, expiresAt, isUsed } = unmarshall(tokenData.Item);
+
+    // Check if token is used
+    if (isUsed) {
+      return res.status(400).send({ message: "This email has already been verified." });
+    }
+
+    // Check if token is expired
+    if (new Date() > new Date(expiresAt)) {
+      return res.status(400).send({ message: "Verification link has expired." });
+    }
+
+    // Mark token as used
+    const updateTokenParams = {
+      TableName: VERIFICATION_TOKENS_TABLE,
+      Key: marshall({ token }),
+      UpdateExpression: "SET isUsed = :isUsed",
+      ExpressionAttributeValues: marshall({
+        ":isUsed": true,
+      }),
+    };
+    await dynamoDB.send(new UpdateItemCommand(updateTokenParams));
+
     const userParams = {
       TableName: USERS_TABLE,
-      Key: marshall({ userId: unmarshall(tokenData.Item).userId }),
+      Key: marshall({ userId }),
     };
     const userData = await dynamoDB.send(new GetItemCommand(userParams));
     if (!userData.Item) {
       return res.status(404).send({ message: "User not found" });
     }
 
+    // Mark user as verified
     const updateUserParams = {
       TableName: USERS_TABLE,
-      Key: marshall({ userId: unmarshall(tokenData.Item).userId }),
-      UpdateExpression: "SET isVerified = :true",
+      Key: marshall({ userId }),
+      UpdateExpression: "SET isVerified = :isVerified",
       ExpressionAttributeValues: marshall({
-        ":true": true,
+        ":isVerified": true,
       }),
     };
     await dynamoDB.send(new UpdateItemCommand(updateUserParams));
-
-    // Remove used token
-    const deleteTokenParams = {
-      TableName: VERIFICATION_TOKENS_TABLE,
-      Key: marshall({ token }),
-    };
-    await dynamoDB.send(new DeleteItemCommand(deleteTokenParams));
 
     res.send({ message: "Email verified successfully!" });
   } catch (error) {

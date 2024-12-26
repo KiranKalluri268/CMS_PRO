@@ -43,6 +43,8 @@ const AddCertificate = ({ rollNumber: studentId }) => {
       window.location.href = `/student-home/${studentId}`;
     } catch (error) {
       if (error.response && error.response.status === 401) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
         window.location.href = "/";
       } else {
         console.error("Failed to upload certificate:", error);

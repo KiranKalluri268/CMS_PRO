@@ -18,6 +18,9 @@ module.exports = {
       console.log("decoded in middleware:", req.userRollNumber, req.studentId, req.role);
       next();
     } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expired" });
+      }
       console.error("Authentication error:", err);
       res.status(400).json({ message: "Invalid token" });
     }
