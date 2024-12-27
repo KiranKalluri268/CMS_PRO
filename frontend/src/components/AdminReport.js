@@ -130,7 +130,7 @@ const AdminReport = () => {
   return (
     <div className="admin-report-container">
       <header className="header">
-        <img src="/images/vaagdevi.png" alt="Logo" className="AdminReportHeader-logo" />
+        <img src="/images/Vaagdevi.png" alt="Logo" className="AdminReportHeader-logo" />
         <img
           src="/images/logout-icon.png"
           alt="Logout"

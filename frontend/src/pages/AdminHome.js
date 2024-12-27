@@ -52,7 +52,7 @@ const AdminHome = () => {
     <div className="admin-home-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.png" alt="Logo" className="AdminHeader-logo" />
+        <img src="/images/Vaagdevi.png" alt="Logo" className="AdminHeader-logo" />
         <img
         src="/images/logout-icon.png"
         alt="Logout"

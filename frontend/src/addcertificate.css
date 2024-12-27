@@ -126,7 +126,7 @@
   }
 
   .AddCertificateHeader-logo {
-    max-width: 200px; /* Adjust the logo size on smaller screens */
+    max-width: 400px; /* Adjust the logo size on smaller screens */
   }
 
   .input-group label {
@@ -151,7 +151,7 @@
 
 @media (max-width: 480px) {
   .AddCertificateHeader-logo {
-    max-width: 400px; /* Adjust the logo size on smaller screens */
+    max-width: 400px;
   }
 
   .upload-box {

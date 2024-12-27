@@ -32,7 +32,7 @@ const Register = () => {
   return (
     <div className="register-container">
       <header className="header">
-        <img src="/images/vaagdevi.png" alt="Logo" className="RegisterHeader-logo" />
+        <img src="/images/Vaagdevi.png" alt="Logo" className="RegisterHeader-logo" />
       </header>
 
       <div className="register-box">
@@ -47,7 +47,7 @@ const Register = () => {
           value={rollNumber}
           onChange={(e) => setRollNumber(e.target.value)}
           required
-          pattern="^[0-3][0-9]{1}[0-9]{3}A[0-9]{2}[A-Z][0-9]$"
+          pattern="^[0-3][0-9]{1}[0-9]{3}A[0-9]{2}[A-Z0-9][0-9]$"
           title="Only uppercase letters are allowed in the roll number (e.g., 22641A05G1)."
         />
       </div>

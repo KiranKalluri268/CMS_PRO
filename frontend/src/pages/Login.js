@@ -58,7 +58,7 @@ const Login = () => {
     <div className="login-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.png" alt="Logo" className="LoginHeader-logo" />
+        <img src="/images/Vaagdevi.png" alt="Logo" className="LoginHeader-logo" />
       </header>
 
       <div className="login-box">

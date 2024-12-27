@@ -96,7 +96,7 @@ const StudentHome = () => {
     <div className="login-container">
       {/* Header Section */}
       <header className="header">
-        <img src="/images/vaagdevi.png" alt="Logo" className="StudentHeader-logo" />
+        <img src="/images/Vaagdevi.png" alt="Logo" className="StudentHeader-logo" />
         <img
           src="/images/logout-icon.png"
           alt="Logout"
