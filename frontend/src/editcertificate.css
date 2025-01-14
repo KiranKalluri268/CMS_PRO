@@ -5,14 +5,14 @@
   align-items: center;
   justify-content: center;
   height: 100vh; /* Full viewport height to center the box */
-  background-color: #ffffff;
+  background-color: #f7f1f169;
   margin: 0;
 }
 
 /* Header styling */
-.header {
+.EditHeader {
   width: 100%;
-  background-color: #ffffff;
+  background-color: #dfdddd65;
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
@@ -34,7 +34,7 @@
 
 /* Style the box that contains the form */
 .edit-box {
-  background-color: #ffffff;
+  background-color: #dfdddd65;
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -69,15 +69,16 @@
 .input-group select {
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #dfdddd65;
   border-radius: 4px;
   font-size: 14px;
   box-sizing: border-box;
+  background-color: #dfdddd65;
 }
 
 /* Style the submit button */
 .edit-box button {
-  width: 52%;
+  width: 38%;
   padding: 10px;
   background-color: #e6bd39a8;
   color: white;

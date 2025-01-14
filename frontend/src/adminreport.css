@@ -4,22 +4,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #f7f6f6;
+  background-color: #f7f6f641;
   margin: 0;
-  margin-top: 110px;
+  margin-top: 145px;
   margin-bottom: 50px;
-  padding-top: 100px; /* Add padding to ensure content is below the header */
+  padding-top: 20px; /* Add padding to ensure content is below the header */
 }
 
 /* Header styling */
-header {
-  background-color: #fdfdfd;
-  padding: 20px 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  left: 0;
+.AdminReportHeader {
   width: 100%;
+  background-color: #dfdddd65;
+  padding: 20px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  position: absolute;
+  top: 0;
   z-index: 1000;
 }
 
@@ -44,7 +44,7 @@ header {
 
 /* Style the box that contains the form */
 .report-list {
-  background-color: #ffffff;
+  background-color: #dfdddd65;
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -53,7 +53,7 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 2px;
+  margin-top: 0px;
 }
 
 /* Add hover effect to the button */

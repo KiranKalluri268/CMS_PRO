@@ -53,7 +53,7 @@ const AdminReport = () => {
     };
 
     fetchCertificates();
-  }, [batchYear]);
+  }, [batchYear, navigate]);
 
   const handleFilterChange = (event) => {
     const selectedYear = event.target.value;
@@ -122,6 +122,14 @@ const AdminReport = () => {
     XLSX.writeFile(wb, `Batch_${batchYear}_Certificates_Report.xlsx`);
   };
 
+  const handleCertificateLinkClick = (certificateLink) => {
+    if (certificateLink) {
+      window.open(certificateLink, '_blank');
+    } else {
+      alert('No link available for this certificate.');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     window.location.href = "/";
@@ -129,7 +137,7 @@ const AdminReport = () => {
 
   return (
     <div className="admin-report-container">
-      <header className="header">
+      <header className="AdminReportHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="AdminReportHeader-logo" />
         <img
           src="/images/logout-icon.png"
@@ -168,8 +176,8 @@ const AdminReport = () => {
                   <th>S.No</th>
                   <th>Roll No</th>
                   <th>Name</th>
-                  <th>Organisation</th>
-                  <th>Course</th>
+                  <th>Title of the event</th>
+                  <th>Organised by</th>
                   <th>From</th>
                   <th>To</th>
                   <th>Academic Year</th>
@@ -182,8 +190,15 @@ const AdminReport = () => {
                     <td>{index + 1}</td>
                     <td>{certificate.student.rollNumber}</td>
                     <td>{certificate.student.name}</td>
+                    <td>
+                      <span
+                        style={{ color: certificate.certificateLink ? 'blue' : 'black', cursor: certificate.certificateLink ? 'pointer' : 'default' }}
+                        onClick={() => handleCertificateLinkClick(certificate.certificateLink)}
+                      >
+                        {certificate.course}
+                      </span>
+                    </td>
                     <td>{certificate.organisation}</td>
-                    <td>{certificate.course}</td>
                     <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
                     <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
                     <td>{new Date(certificate.toDate).getFullYear()}</td>

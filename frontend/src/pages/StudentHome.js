@@ -38,7 +38,7 @@ const StudentHome = () => {
       }
     };
     fetchCertificates();
-  }, [studentId, token]);
+  }, [studentId, token, navigate]);
 
   const handleDownload = async (downloadLink, fileName) => {
     if (!downloadLink) {
@@ -93,9 +93,9 @@ const StudentHome = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="Student-container">
       {/* Header Section */}
-      <header className="header">
+      <header className="StudentHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="StudentHeader-logo" />
         <img
           src="/images/logout-icon.png"
@@ -115,8 +115,8 @@ const StudentHome = () => {
           <thead>
             <tr>
               <th>S.No</th>
-              <th>Organisation</th>
-              <th>Course</th>
+              <th>Title of the Event</th>
+              <th>Organised by</th>
               <th>From</th>
               <th>To</th>
               <th>Academic Year</th>
@@ -134,7 +134,6 @@ const StudentHome = () => {
                 return (
                   <tr key={cert.certificateId}>
                     <td>{index + 1}</td>
-                    <td>{cert.organisation}</td>
                     <td>
                       <span
                         style={{ color: cert.certificateLink ? 'blue' : 'black', cursor: cert.certificateLink ? 'pointer' : 'default' }}
@@ -143,6 +142,7 @@ const StudentHome = () => {
                         {cert.course}
                       </span>
                     </td>
+                    <td>{cert.organisation}</td>
                     <td>{fromDate}</td>
                     <td>{toDate}</td>
                     <td>{academicYear}</td>

@@ -36,7 +36,7 @@ const AdminHome = () => {
       }
     };
     fetchBatches();
-  }, []);
+  }, [navigate]);
 
   const handleBatchSelect = ( batchYear) => {
     navigate(`/admin-report/${batchYear}`);
@@ -51,7 +51,7 @@ const AdminHome = () => {
   return (
     <div className="admin-home-container">
       {/* Header Section */}
-      <header className="header">
+      <header className="AdminHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="AdminHeader-logo" />
         <img
         src="/images/logout-icon.png"

@@ -54,19 +54,19 @@ const AddCertificate = ({ rollNumber: studentId }) => {
 
   return (
     <div className="upload-form-container">
-      <header className="header">
+      <header className="AddCertificateHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="AddCertificateHeader-logo" />
       </header>
       <div className="upload-box">
-        <h1 className="upload-title">Upload Certificates</h1>
+        <h1 className="upload-title">Upload Certificate</h1>
         <form className="upload" onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="input-group">
-            <label htmlFor="organisation">Organisation:</label>
-            <input id="organisation" type="text" name="organisation" onChange={handleChange} placeholder="Enter Name of Organisation" required />
+            <label htmlFor="Course">Title of the event:</label>
+            <input id="Course" type="text" name="course" onChange={handleChange} placeholder="Certified course" required />
           </div>
           <div className="input-group">
-            <label htmlFor="Course">Course/Topic:</label>
-            <input id="Course" type="text" name="course" onChange={handleChange} placeholder="Certified course" required />
+            <label htmlFor="organisation">Organised by:</label>
+            <input id="organisation" type="text" name="organisation" onChange={handleChange} placeholder="Enter Name of Organisation" required />
           </div>
           <div className="input-group">
             <label htmlFor="fromDate">From:</label>
@@ -78,13 +78,13 @@ const AddCertificate = ({ rollNumber: studentId }) => {
           </div>
           <div className="input-group">
             <label htmlFor="certificateLink">Certificate Link:</label>
-            <input id="certificateLink" type="url" name="certificateLink" onChange={handleChange} placeholder="Optional link" />
+            <input id="certificateLink" type="url" name="certificateLink" onChange={handleChange} placeholder="Certificate link from Google drive" />
           </div>
           <div className="input-group">
             <label htmlFor="pdf">Upload PDF:</label>
             <input id="pdf" type="file" accept="application/pdf" onChange={handleFileChange} />
           </div>
-          <button type="submit">Upload Certificate</button>
+          <button type="submit">Submit</button>
         </form>
       </div>
       <footer className="footer">

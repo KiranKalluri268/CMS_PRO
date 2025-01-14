@@ -57,7 +57,7 @@ const Login = () => {
   return (
     <div className="login-container">
       {/* Header Section */}
-      <header className="header">
+      <header className="LoginHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="LoginHeader-logo" />
       </header>
 
@@ -65,14 +65,15 @@ const Login = () => {
         <h1 className="login-title">Login</h1>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="userID">User ID:</label>
+            <label htmlFor="userID">Roll No :</label>
             <input
               id="userID"
               type="text"
-              placeholder="Enter UserID/RollNumber"
+              placeholder="Enter RollNumber"
               value={rollNumber}
               onChange={(e) => setRollNumber(e.target.value)}
               required
+              title="Only uppercase letters are allowed in the roll number (e.g., 22641A05G1)."
             />
           </div>
           <div className="input-group">

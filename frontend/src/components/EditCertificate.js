@@ -108,31 +108,31 @@ const EditCertificate = () => {
   return (
     <div className="edit-form-container">
       {/* Header Section */}
-      <header className="header">
+      <header className="EditHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="EditHeader-logo" />
       </header>
     <div className="edit-box">
       <h2 className="edit-title">Edit Certificate</h2>
       <form className="edit" onSubmit={handleSubmit}>
         <div className="input-group">
-          <label htmlFor="organisation">Organisation:</label>
+          <label htmlFor="course">Title of the event:</label>
           <input
-            id="organisation"
+            id="course"
             type="text"
-            name="organisation"
-            value={certificate.organisation}
+            name="course"
+            value={certificate.course}
             onChange={handleChange}
             required
           />
         </div>
         <br />
         <div className="input-group">
-          <label htmlFor="course">Course:</label>
+          <label htmlFor="organisation">Organised by:</label>
           <input
-            id="course"
+            id="organisation"
             type="text"
-            name="course"
-            value={certificate.course}
+            name="organisation"
+            value={certificate.organisation}
             onChange={handleChange}
             required
           />
@@ -170,7 +170,7 @@ const EditCertificate = () => {
             name="certificateLink"
             value={certificate.certificateLink}
             onChange={handleChange}
-            placeholder="Enter certificate URL"
+            placeholder="Enter certificate link from Google drive"
           />
         </div>
         <br />
