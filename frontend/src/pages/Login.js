@@ -30,12 +30,9 @@ const Login = () => {
           console.log("Decoded in frontend login:",decodedToken);
           const userRole = decodedToken.userRole; // Extract the role from the token
           const userRollNumber = decodedToken.userRollnumber;
-          const userName = decodedToken.userName;
 
           console.log('Decoded rollNumber:', userRollNumber);
           console.log('Decoded user role:', userRole);
-
-          alert(`Welcome, ${userName}`);
         
           // Redirect based on userRole
           if (userRole === 'student') {

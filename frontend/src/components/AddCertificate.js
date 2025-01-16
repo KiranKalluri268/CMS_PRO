@@ -62,7 +62,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
         <form className="upload" onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="input-group">
             <label htmlFor="Course">Title of the event:</label>
-            <input id="Course" type="text" name="course" onChange={handleChange} placeholder="Certified course" required />
+            <input id="Course" type="text" name="course" onChange={handleChange} placeholder="Enter Title of Event" required />
           </div>
           <div className="input-group">
             <label htmlFor="organisation">Organised by:</label>
