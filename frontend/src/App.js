@@ -6,12 +6,12 @@ import StudentHome from "./pages/StudentHome";
 import AdminHome from "./pages/AdminHome";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import AddCertificate from './components/AddCertificate';
-import EditCertificate from './components/EditCertificate';
-import AdminReport from './components/AdminReport';
-import VerifyEmail from './components/EmailVerification';
+import AddCertificate from './pages/AddCertificate';
+import EditCertificate from './pages/EditCertificate';
+import AdminReport from './pages/AdminReport';
+import VerifyEmail from './pages/EmailVerification';
 import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./components/ResetPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Set the global baseURL for all Axios requests
 axios.defaults.baseURL = process.env.REACT_APP_API_URL; // or use an environment variable for flexibility

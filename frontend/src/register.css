@@ -21,10 +21,10 @@
 
 /* Styling for the image in the header */
 .RegisterHeader-logo {
-  width: 100%;  /* Ensure the image takes up full width of the header */
-  height: auto; /* Maintain aspect ratio */
-  max-width: 800px; /* Set a max width for large screens */
-  object-fit: contain; /* Ensure the image fits without distortion */
+  width:auto;
+  height: 100%;
+  max-height: 130px;
+  object-fit: contain;
 }
 
 /* Register form box */

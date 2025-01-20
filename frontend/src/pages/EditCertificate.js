@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../editcertificate.css';
@@ -14,8 +15,10 @@ const EditCertificate = () => {
     certificateLink: '',  // New field for certificate link
   });
   const [file, setFile] = useState(null);
-
   const navigate = useNavigate();
+  const token = localStorage.getItem('authToken');
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+
   useEffect(() => {
     const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
     if (!token) {
@@ -185,6 +188,7 @@ const EditCertificate = () => {
             Delete Certificate
           </button>
         </div>
+        <Link to={`/student-home/${decodedToken.userId}`}>Go back to home</Link>
       </form>
     </div>
 

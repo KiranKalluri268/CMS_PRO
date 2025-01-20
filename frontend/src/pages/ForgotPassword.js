@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import axios from "axios";
+import '../forgot.css'
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -20,20 +22,39 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="forgot-password">
-      <h1>Forgot Password</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit">Send Reset Link</button>
-      </form>
-      {message && <p className="success">{message}</p>}
-      {error && <p className="error">{error}</p>}
+    <div className="forgot-container">
+      {/* Header Section */}
+      <header className="ForgotHeader">
+        <img src="/images/Vaagdevi.png" alt="Logo" className="ForgotHeader-logo" />
+      </header>
+
+      <div className="forgot-box">
+        <h1 className="forgot-title">Forgot Password</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="forgot-input-group">
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              pattern="^[0-3][0-9]{1}[0-9]{3}a[0-9]{2}[a-z0-9][0-9]@vaagdevi.edu.in$"
+              title="Only college mail is allowed (e.g., 22641a05g1@vaagdevi.edu.in)."
+            />
+          </div>
+          <button type="submit">Send Reset Link</button>
+                    <br />
+                    <Link to="/">Login here</Link>
+        </form>
+        {message && <p className="success">{message}</p>}
+        {error && <p className="error">{error}</p>}
+      </div>
+
+      {/* Footer Section */}
+      <footer className="footer">
+        <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
+      </footer>
     </div>
   );
 };

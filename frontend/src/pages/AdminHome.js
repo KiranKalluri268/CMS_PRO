@@ -56,7 +56,8 @@ const AdminHome = () => {
         <img
         src="/images/logout-icon.png"
         alt="Logout"
-        style={{ cursor: 'pointer', width: '60px', height: '60px' }}
+        className="AdminHeader-Logout-Logo"
+        style={{ cursor: 'pointer'}}
         onClick={handleLogout}
         />
       </header>
