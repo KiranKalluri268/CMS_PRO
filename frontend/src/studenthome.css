@@ -1,4 +1,5 @@
 /* Center the content and add padding to allow scrolling */
+
 .Student-container {
   display: flex;
   flex-direction: column;
@@ -7,9 +8,9 @@
   background-color: #f7f6f641;
   margin: 0;
   margin-top: 0px;
-  padding-top: 20px; /* Ensure space for header */
+  padding-top: 0px; /* Ensure space for header */
   overflow-y: auto; /* Allow vertical scrolling */
-  height: calc(100vh - 110px); /* Ensure the container takes the full height, minus header */
+  height: calc(100vh); /* Ensure the container takes the full height, minus header */
 }
 
 /* Header styling */
@@ -26,16 +27,25 @@
 }
 
 .StudentHeader-logo {
-  width: 100%;
-  height: auto;
-  max-width: 1000px;
+  width:auto;
+  height: 100%;
+  max-height: 130px;
   object-fit: contain;
 }
 .StudentLogout-logo {
-  width: 100%;
-  height: auto;
-  max-width: 60px;
-  object-fit: contain
+  width: auto;
+  height: 100%;
+  max-height: 100px;
+  object-fit: contain;
+  position: absolute;
+  right: 0px;
+  bottom: 25px;
+  opacity: 0.7; /* Initial opacity */
+  transition: opacity 0.3s ease; /* Smooth transition effect */
+}
+
+.StudentLogout-logo:hover {
+  opacity: 1; /* Full opacity on hover */
 }
 
 /* Styling for the table container */
@@ -54,25 +64,28 @@
   overflow-y: auto; /* Allow vertical scrolling for table content */
 }
 
+.Name {
+  color: #970f0f;
+}
+
 /* Table styling */
 table {
   width: 100%; /* Take full width of container */
   border-collapse: collapse;
-  margin-top: 10px;
   table-layout: auto; /* Allow table cells to adjust based on content */
 }
 
 th, td {
   padding: 10px;
-  text-align: center;
+  text-align: left;
   border: 1px solid #ddd;
-  word-wrap: break-word;
-  white-space: normal; /* Allow text to wrap */
+  white-space: nowrap; /* Allow text to wrap */
 }
 
 th {
   background-color: #4caf50;
   color: white;
+  font-weight: bold;
 }
 
 tr:nth-child(even) {
@@ -131,4 +144,14 @@ button:hover {
   .list {
     margin-top: 90px;
   }
+}
+
+.list {
+  transition: box-shadow 0.s ease;
+}
+
+.list:hover {
+  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
+              0 0 20px 10px rgba(255, 255, 255, 0.5), 
+              0 0 30px 15px rgba(255, 255, 255, 0.3);
 }

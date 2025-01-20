@@ -112,7 +112,66 @@ const getCertificatesByBatch = async (req, res) => {
   }
 };
 
+
+// Fetch all certificates
+const getAllCertificates = async (req, res) => {
+  try {
+    const params = {
+      TableName: process.env.CERTIFICATES_TABLE, // Replace with your certificates table name
+    };
+
+    // Use ScanCommand to fetch all certificates from the table
+    const response = await dynamoDB.send(new ScanCommand(params));
+
+    if (!response.Items || response.Items.length === 0) {
+      return res.status(404).json({ message: "No certificates found" });
+    }
+
+    const certificates = [];
+
+    for (const certificate of response.Items) {
+      const studentId = certificate.studentId;
+
+      // Fetch student details from the Users table
+      const studentParams = {
+        TableName: process.env.USERS_TABLE, // Replace with your users table name
+        Key: {
+          userId: studentId, // Assuming the studentId is the same as userId
+        },
+      };
+
+      const studentResponse = await dynamoDB.send(new GetCommand(studentParams));
+
+      if (studentResponse.Item) {
+        const student = studentResponse.Item;
+        // Add student details (name and rollNumber) to the certificate
+        certificate.student = {
+          name: student.name,
+          rollNumber: student.rollNumber,
+        };
+      }
+
+      certificates.push(certificate);
+    }
+
+    if (certificates.length === 0) {
+      return res.status(404).json({ message: "No certificates found" });
+    }
+
+    console.log("fetched certs:",certificates)
+
+    res.status(200).json({
+      success: true,
+      certificates,
+    });
+  } catch (error) {
+    console.error("Error fetching all certificates:", error);
+    res.status(500).json({ message: "Error fetching all certificates" });
+  }
+};
+
 module.exports = {
   getBatches,
   getCertificatesByBatch,
+  getAllCertificates, // Export the new function
 };

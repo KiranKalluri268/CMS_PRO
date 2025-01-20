@@ -167,3 +167,13 @@
     padding: 15px; /* Make footer padding larger for smaller screens */
   }
 }
+
+.edit-box {
+  transition: box-shadow 0.s ease;
+}
+
+.edit-box:hover {
+  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
+              0 0 20px 10px rgba(255, 255, 255, 0.5), 
+              0 0 30px 15px rgba(255, 255, 255, 0.3);
+}

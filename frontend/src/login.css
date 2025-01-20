@@ -22,9 +22,8 @@
 .LoginHeader-logo {
   width: 100%;  /* Ensure the image takes up full width of the header */
   height: auto; /* Maintain aspect ratio */
-  max-width: 650px; /* Set a max width for large screens */
+  max-width: 800px; /* Set a max width for large screens */
   object-fit: contain; /* Ensure the image fits without distortion */
-  background-color: #dfdddd2f;
 }
 
 /* Login form box */
@@ -38,6 +37,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.login-title {
+  color: #970f0f;
 }
 
 /* Form elements */
@@ -147,4 +150,14 @@
   .login-box button {
     width: 30%; /* Adjust button size for tablets */
   }
+}
+
+.login-box {
+  transition: box-shadow 0.s ease;
+}
+
+.login-box:hover {
+  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
+              0 0 20px 10px rgba(255, 255, 255, 0.5), 
+              0 0 30px 15px rgba(255, 255, 255, 0.3);
 }

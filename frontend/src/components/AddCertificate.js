@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { uploadCertificate } from "../api";
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import "../addcertificate.css";
 
 const AddCertificate = ({ rollNumber: studentId }) => {
   const [formData, setFormData] = useState({ organisation: '', course: '', fromDate: '', toDate: '', certificateLink: '' });
   const [pdf, setPdf] = useState(null);
+  const token = localStorage.getItem('authToken');
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -84,7 +87,8 @@ const AddCertificate = ({ rollNumber: studentId }) => {
             <label htmlFor="pdf">Upload PDF:</label>
             <input id="pdf" type="file" accept="application/pdf" onChange={handleFileChange} />
           </div>
-          <button type="submit">Submit</button>
+          <button type="submit">Submit</button><br/>
+          <Link to={`/student-home/${decodedToken.userId}`}>Go back to home</Link>
         </form>
       </div>
       <footer className="footer">

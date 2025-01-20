@@ -23,7 +23,7 @@
 .RegisterHeader-logo {
   width: 100%;  /* Ensure the image takes up full width of the header */
   height: auto; /* Maintain aspect ratio */
-  max-width: 550px; /* Set a max width for large screens */
+  max-width: 800px; /* Set a max width for large screens */
   object-fit: contain; /* Ensure the image fits without distortion */
 }
 
@@ -38,18 +38,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 80px;
+}
+
+.register-title {
+  color: #970f0f;
 }
 
 /* Form elements */
-.input-group {
+.register-input-group {
   margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+
 /* Label styling */
-.input-group label {
+.register-input-group label {
   display: inline-block;
   width: 80px;
   font-size: 14px;
@@ -58,15 +64,52 @@
   text-align: right;
 }
 
+.password-label label{
+  top: 10px !important;
+}
+
 /* Input fields */
-.input-group input,
-.input-group select {
+.register-input-group input,
+.register-input-group select {
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid #dfdddd9a;
+  border: 1px solid #dfdddd65;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
   border-radius: 4px;
   font-size: 14px;
   box-sizing: border-box;
+  background-color: #dfdddd65;
+}
+
+.input-group-password {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 12px;
+  justify-content: space-between;
+}
+
+/* Label styling */
+.input-group-password label {
+  display: inline-block;
+  width: 80px;
+  font-size: 14px;
+  margin-top: 11px;
+  margin-right: 10px;
+  color: #333;
+  text-align: right;
+}
+
+/* Input fields */
+.input-group-password input,
+.input-group-password select {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #dfdddd65;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: #dfdddd65;
 }
 
 /* Register button */
@@ -84,6 +127,8 @@
 }
 
 .password-rules {
+  width: 200px;
+  right: 0px;
   margin-top: 0.5rem;
   padding: 2px;
   border: 1px solid #bdbaba;
@@ -162,7 +207,7 @@
 /* Tablet responsiveness */
 @media (min-width: 768px) and (max-width: 1024px) {
   .register-box {
-    width: 40%; /* Allow more space on tablets */
+    width: 35%; /* Allow more space on tablets */
   }
 
   .register-box h1 {
@@ -172,4 +217,14 @@
   .register-box button {
     width: 40%; /* Adjust button size for tablets */
   }
+}
+
+.register-box {
+  transition: box-shadow 0.s ease;
+}
+
+.register-box:hover {
+  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
+              0 0 20px 10px rgba(255, 255, 255, 0.5), 
+              0 0 30px 15px rgba(255, 255, 255, 0.3);
 }

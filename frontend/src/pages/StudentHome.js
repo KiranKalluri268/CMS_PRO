@@ -107,10 +107,10 @@ const StudentHome = () => {
 
       <div className="list">
         <div className="nav">
-          <h1>Welcome, {userName}</h1>
+          <h1 className='Name'>Welcome, {userName}</h1>
           <button onClick={() => navigate('/add-certificate')}>Add New Certificate</button>
         </div>
-
+        <div className='report-table-wrapper'>
         <table>
           <thead>
             <tr>
@@ -167,6 +167,7 @@ const StudentHome = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Footer Section */}

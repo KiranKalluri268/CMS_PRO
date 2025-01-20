@@ -21,9 +21,9 @@
 }
 
 .AddCertificateHeader-logo {
-  max-width: 100%; /* Ensure it scales properly */
-  height: auto;
-  max-width: 650px; /* Limit the logo size */
+  width:auto;
+  height: 100%;
+  max-height: 130px;
   object-fit: contain;
 }
 
@@ -165,4 +165,14 @@
   .footer {
     padding: 15px; /* Make footer padding larger for smaller screens */
   }
+}
+
+.upload-box {
+  transition: box-shadow 0.s ease;
+}
+
+.upload-box:hover {
+  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
+              0 0 20px 10px rgba(255, 255, 255, 0.5), 
+              0 0 30px 15px rgba(255, 255, 255, 0.3);
 }

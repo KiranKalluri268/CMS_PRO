@@ -148,7 +148,7 @@ const AdminReport = () => {
       </header>
 
       <div className="report-list">
-        <h2>Certificates for Batch {batchYear}</h2>
+        <h2 className="batch-title">Certificates for Batch {batchYear}</h2>
 
         <div className="filter-container">
           <label htmlFor="academic-year-filter">Filter by Academic Year:</label>
@@ -162,7 +162,7 @@ const AdminReport = () => {
               <option key={year} value={year}>{year}</option>
             ))}
           </select>
-        </div>
+        </div><br/>
 
         <button className="download-report-btn" onClick={handleDownloadExcel}>
           Download Report as Excel

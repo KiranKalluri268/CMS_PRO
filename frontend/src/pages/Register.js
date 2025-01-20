@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from "axios";
 import '../register.css';
 
@@ -67,7 +68,7 @@ const Register = () => {
       <div className="register-box">
         <h1 className="register-title">Register</h1>
         <form onSubmit={handleSubmit}>
-          <div className="input-group">
+          <div className="register-input-group">
             <label htmlFor="rollNo">Roll No:</label>
             <input
               id="rollNo"
@@ -81,7 +82,7 @@ const Register = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="register-input-group">
             <label htmlFor="name">Name:</label>
             <input
               id="name"
@@ -93,7 +94,7 @@ const Register = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="register-input-group">
             <label htmlFor="email">Email:</label>
             <input
               id="email"
@@ -108,8 +109,11 @@ const Register = () => {
           </div>
 
           <div className="input-group-password">
-          <div className="input-group">
+            <div className='password-label'>
             <label htmlFor="password">Password:</label>
+            </div>
+            <div className="password-input-rules">
+            <div className='password-input'>
             <input
               id="password"
               type="password"
@@ -128,11 +132,12 @@ const Register = () => {
               <li className={passwordRules.hasSpecialChar ? "valid" : "invalid"}>At least one special character (!@#$%^&*)</li>
             </ul>
             </div>
+            </div>
           </div>
 
           <button type="submit">Register</button>
           <br />
-          <a href="./">Already have an account? Login here</a>
+          <Link to="/">Already have an account? Login here</Link>
         </form>
       </div>
 
