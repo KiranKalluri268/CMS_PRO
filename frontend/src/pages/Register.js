@@ -66,7 +66,7 @@ const Register = () => {
       </header>
 
       <div className="register-box">
-        <h1 className="register-title">Register Now!</h1>
+        <h1 className="register-title">Register</h1>
         <form onSubmit={handleSubmit}>
           <div className="register-input-group">
             <label htmlFor="rollNo">Roll No:</label>
