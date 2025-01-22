@@ -53,7 +53,6 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      {/* Header Section */}
       <header className="LoginHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="LoginHeader-logo" />
       </header>
@@ -95,7 +94,6 @@ const Login = () => {
         </form>
       </div>
 
-      {/* Footer Section */}
       <footer className="footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>
