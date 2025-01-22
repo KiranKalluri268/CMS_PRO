@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -14,12 +14,37 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
 // Set the global baseURL for all Axios requests
-axios.defaults.baseURL = process.env.REACT_APP_API_URL; // or use an environment variable for flexibility
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    // You can add other global configurations or logic here if needed
+    // Check if the website is online by sending a request
+    const checkWebsiteStatus = async () => {
+      try {
+        await axios.get(process.env.REACT_APP_API_URL); // Use the URL from .env
+        setIsLoading(false); // Website is online, stop loading screen
+      } catch (error) {
+        console.log("Website is offline, retrying...");
+        // No action needed here, it will retry automatically
+      }
+    };
+
+    // Start checking immediately
+    checkWebsiteStatus();
+
+    // Retry every 5 seconds until the backend responds
+    const intervalId = setInterval(checkWebsiteStatus, 5000);
+
+    // Cleanup the interval when the component is unmounted
+    return () => clearInterval(intervalId);
   }, []);
+
+  if (isLoading) {
+    return <div className="loading-screen">Loading...</div>; // Customize loading screen as needed
+  }
+
   return (
     <Router>
       <Routes>
