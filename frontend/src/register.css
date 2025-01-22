@@ -188,11 +188,10 @@
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .RegisterHeader-logo {
-    max-width: 450px; /* Reduce size for smaller screens */
+    max-width: 300px; /* Reduce size for smaller screens */
   }
-  .register-box {
-    width: 75%; /* Reduce the width for smaller screens */
-    padding: 20px;
+  .register-box { /* Reduce the width for smaller screens */
+    padding: 15px;
   }
 
   .register-box h1 {

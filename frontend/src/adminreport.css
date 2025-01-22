@@ -56,15 +56,15 @@
 /* Style the box that contains the form */
 .report-list {
   background-color: #dfdddd65;
-  padding: 30px;
+  padding: 1%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  width: 95%;
+  width: 95% !important;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 25px;
+  margin-top: 45px !important;
 }
 
 /* Add hover effect to the button */
@@ -125,7 +125,11 @@
   }
 
   .AdminReportLogoout-logo {
-    max-width: 60px;
+    max-width: 40px;
+  }
+
+  .report-table-wrapper{
+    width: 100%;
   }
 
   .AdminReportHeader-logo {

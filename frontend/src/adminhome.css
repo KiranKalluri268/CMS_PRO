@@ -54,7 +54,7 @@
 .batch-list {
   background-color: #dfdddd65;
   color: #970f0f;
-  padding: 30px;
+  padding: 1%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   width: 300px;
@@ -62,13 +62,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 0px;
+  top: 0px;
 }
 
 .batch-list ul {
   list-style: none; /* Remove dots from the list */
   padding: 0;
   margin: 0;
+  margin-bottom: 20px;
 }
 
 .batch-list li {
@@ -113,11 +114,15 @@
 @media (max-width: 768px) {
   .batch-list {
     width: 90%; /* Make the form width responsive */
-    margin-top: 100px; /* Adjust margin for smaller screens */
+    margin-top: 0px; /* Adjust margin for smaller screens */
   }
 
   .AdminHeader-logo {
     max-width: 480px; /* Adjust the logo size */
+  }
+
+  .AdminHeader-Logout-Logo {
+    max-height: 50px;
   }
 
   .batch-title {
@@ -132,11 +137,15 @@
 
 @media (max-width: 480px) {
   .AdminHeader-logo {
-    max-width: 350px;
+    max-width: 300px;
+  }
+
+  .AdminHeader-Logout-Logo {
+    max-height: 40px;
   }
 
   .batch-list {
-    width: 85%; /* Adjust to fit on smaller screens */
+    width: 80%; /* Adjust to fit on smaller screens */
   }
 
   .footer {

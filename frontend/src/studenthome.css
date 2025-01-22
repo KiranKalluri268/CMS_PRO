@@ -51,10 +51,10 @@
 /* Styling for the table container */
 .list {
   background-color: #dfdddd65;
-  padding: 30px;
+  padding: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   border-radius: 8px;
-  width: 95%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   margin-top: 20px; /* Ensure there's spacing between the header and the list */
@@ -126,7 +126,7 @@ button:hover {
 /* Responsive design for mobile */
 @media (max-width: 768px) {
   .StudentHeader-logo {
-    max-width: 350px;
+    max-width: 300px;
   }
 
   .StudentLogout-logo {
@@ -143,6 +143,7 @@ button:hover {
 
   .list {
     margin-top: 90px;
+    width: 93%;
   }
 }
 

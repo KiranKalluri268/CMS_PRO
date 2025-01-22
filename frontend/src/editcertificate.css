@@ -154,11 +154,11 @@
 
 @media (max-width: 480px) {
   .EditHeader-logo {
-    max-width: 400px; 
+    max-width: 300px; 
   }
 
   .edit-box {
-    width: 75%; /* Adjust to fit on smaller screens */
+    width: 80%; /* Adjust to fit on smaller screens */
   }
 
   .edit-title {

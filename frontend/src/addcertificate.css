@@ -146,18 +146,18 @@
   }
 
   .upload-box button {
-    width: 100%; /* Make the button full width on mobile */
+    width: 30%; /* Make the button full width on mobile */
     padding: 12px; /* Increase padding for better usability */
   }
 }
 
 @media (max-width: 480px) {
   .AddCertificateHeader-logo {
-    max-width: 400px;
+    max-width: 300px;
   }
 
   .upload-box {
-    width: 75%; /* Adjust to fit on smaller screens */
+    width: 80%; /* Adjust to fit on smaller screens */
   }
 
   .upload-title {
