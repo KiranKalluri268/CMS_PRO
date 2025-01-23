@@ -20,26 +20,22 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if the website is online by sending a request
     const checkWebsiteStatus = async () => {
       try {
-        await axios.get(process.env.REACT_APP_API_URL); // Use the URL from .env
-        setIsLoading(false); // Website is online, stop loading screen
+        const response = await axios.get('/'); // Ensure this endpoint is accessible
+        if (response.status === 200) {
+          setIsLoading(false);
+        }
       } catch (error) {
-        console.log("Website is offline, retrying...");
-        // No action needed here, it will retry automatically
+        console.error("Website is offline, retrying:", error.message);
       }
     };
-
-    // Start checking immediately
+  
     checkWebsiteStatus();
-
-    // Retry every 5 seconds until the backend responds
     const intervalId = setInterval(checkWebsiteStatus, 5000);
-
-    // Cleanup the interval when the component is unmounted
     return () => clearInterval(intervalId);
   }, []);
+  
 
   if (isLoading) {
     return <div className="loading-screen">Loading...</div>; // Customize loading screen as needed
