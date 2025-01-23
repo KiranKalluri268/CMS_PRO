@@ -171,7 +171,7 @@ const StudentHome = () => {
       </div>
 
       {/* Footer Section */}
-      <footer className="footer">
+      <footer className="Studenthome-footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>
     </div>

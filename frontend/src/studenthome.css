@@ -19,7 +19,7 @@
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
-  position: sticky; /* Fix the header at the top and make it scroll with content */
+  position: static; /* Fix the header at the top and make it scroll with content */
   top: 0;
   left: 0;
   width: 100%;
@@ -58,7 +58,7 @@
   display: flex;
   flex-direction: column;
   margin-top: 30px; /* Ensure there's spacing between the header and the list */
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   overflow-x: auto; /* Allow horizontal scrolling */
   max-height: calc(100vh - 200px); /* Ensure table content is scrollable without overlapping footer */
   overflow-y: auto; /* Allow vertical scrolling for table content */
@@ -106,19 +106,19 @@ button:hover {
 }
 
 /* Footer styling */
-.footer {
+.Studenthome-footer {
   width: 100%;
   background-color: #333;
   color: white;
   text-align: center;
   padding: 10px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: fixed;
+  position: static;
   bottom: 0;
   z-index: 1000;
 }
 
-.footer p {
+.Studenthome-footer p {
   margin: 0;
   font-size: 14px;
 }

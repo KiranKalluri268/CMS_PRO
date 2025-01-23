@@ -220,7 +220,7 @@ const AdminReport = () => {
         )}
       </div>
 
-      <footer className="footer">
+      <footer className="Adminreport-footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>
     </div>
