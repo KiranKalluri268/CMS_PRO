@@ -18,7 +18,7 @@
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
-  position:static; /* Fix the header at the top and make it scroll with content */
+  position:sticky; /* Fix the header at the top and make it scroll with content */
   top: 0;
   left: 0;
   width: 100%;
@@ -28,14 +28,14 @@
 .AdminReportHeader-logo {
   width:auto;
   height: 100%;
-  max-height: 130px;
+  max-height: 100px;
   object-fit: contain;
 }
 
 .AdminReportLogoout-logo {
   width: auto;
   height: 100%;
-  max-height: 100px;
+  max-height: 80px;
   object-fit: contain;
   position: absolute;
   right: 0px;
@@ -66,6 +66,7 @@
   align-items: center;
   margin-top: 45px !important;
   margin-bottom: 45px;
+  max-height: 621px;
 }
 
 /* Add hover effect to the button */
@@ -81,21 +82,13 @@
   text-align: center;
   padding: 10px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: static !important;
+  position: absolute;
   bottom: 0;
 }
 
 .Adminreport-footer p {
   margin: 0;
   font-size: 14px;
-}
-
-/* Style the table to be scrollable horizontally */
-.report-table-wrapper {
-  width: 100%;
-  overflow-x: auto; /* Enable horizontal scrolling */
-  margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Style for the table */
@@ -123,6 +116,7 @@
   .report-list {
     width: 80%;
     margin-top: 120px;
+    max-height: 660px;
   }
 
   .AdminReportLogoout-logo {

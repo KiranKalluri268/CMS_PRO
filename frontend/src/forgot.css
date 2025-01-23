@@ -22,7 +22,7 @@
   .ForgotHeader-logo {
     width: auto;
     height: 100%;
-    max-height: 130px;
+    max-height: 100px;
     object-fit: contain;
   }
   
@@ -120,7 +120,7 @@
   /* Mobile responsiveness */
   @media (max-width: 768px) {
     .ForgotHeader-logo {
-      max-width: 450px; /* Reduce size for smaller screens */
+      max-width: 300px; /* Reduce size for smaller screens */
     }
   
     .forgot-box {

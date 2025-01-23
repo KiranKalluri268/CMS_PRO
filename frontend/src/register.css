@@ -23,7 +23,7 @@
 .RegisterHeader-logo {
   width:auto;
   height: 100%;
-  max-height: 130px;
+  max-height: 100px;
   object-fit: contain;
 }
 

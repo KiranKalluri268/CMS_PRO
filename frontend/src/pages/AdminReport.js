@@ -169,7 +169,7 @@ const AdminReport = () => {
         </button>
 
         {filteredCertificates.length > 0 ? (
-          <div className="report-table-wrapper">
+          <div className="table-wrapper">
             <table className="report-table">
               <thead>
                 <tr>

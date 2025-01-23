@@ -1,9 +1,18 @@
 /* Global Styles */
-.report-table-wrapper {
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: auto;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-wrapper {
   transition: box-shadow 0.s ease;
 }
 
-.report-table-wrapper:hover {
+.table-wrapper:hover {
   box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.9), 
               0 0 20px 10px rgba(255, 255, 255, 0.7), 
               0 0 30px 15px rgba(255, 255, 255, 0.5);
