@@ -1,0 +1,48 @@
+.main-email {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: radial-gradient(rgb(1, 41, 46), rgb(5, 124, 94));
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  
+  .email-h1 {
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+  }
+  
+  .zoom-animation {
+    font-size: 2rem;
+    color: #0a0e2c;
+    margin-top: 20px;
+    animation: zoomInOut 2s ease-in-out infinite; /* Zoom animation */
+  }
+  
+  .gif-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 20px 0;
+    animation: zoomInOut 2s ease-in-out infinite; /* Zoom animation */
+  }
+  
+  .verification-gif {
+    width: 500px;
+    height: auto;
+  }
+  
+  /* Zoom Animation Keyframes */
+  @keyframes zoomInOut {
+    0%, 100% {
+      transform: scale(1); /* Original size */
+    }
+    50% {
+      transform: scale(1.2); /* Zoomed-in size */
+    }
+  }
+  

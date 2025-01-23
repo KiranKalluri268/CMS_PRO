@@ -1,29 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import "../emailverification.css";
 
 const VerifyEmail = () => {
   const [message, setMessage] = useState("");
-  const location = useLocation();  // Get location directly from the hook
+  const [gifUrl, setGifUrl] = useState(""); // State to store the GIF URL
+  const location = useLocation();
 
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        const query = new URLSearchParams(location.search);  // Move query construction inside useEffect
+        const query = new URLSearchParams(location.search);
         const token = query.get("token");
         const response = await axios.get(`/api/auth/verify-email?token=${token}`);
         setMessage(response.data.message);
+        setGifUrl("/images/verifed.gif"); // Set success GIF URL
       } catch (error) {
-        setMessage(error.response?.data?.message || "Verification failed.");
+        const errorMessage = error.response?.data?.message || "Verification failed.";
+        setMessage(errorMessage);
+
+        // Check the error message to display the appropriate GIF
+        if (errorMessage === "This email has already been verified.") {
+          setGifUrl("/images/verifed.gif");
+        } else {
+          setGifUrl("/images/expired.gif"); // Failure GIF URL
+        }
       }
     };
     verifyEmail();
-  }, [location.search]);  // Add location.search as the dependency to trigger the effect on location change
+  }, [location.search]);
 
   return (
-    <div>
-      <h1>Email Verification</h1>
-      <p>{message}</p>
+    <div className="main-email">
+      <div className="gif-container zoom-animation">
+        {gifUrl && (
+          <img
+            src={gifUrl}
+            alt="Email Verification"
+            className="verification-gif"
+          />
+        )}
+      </div>
+      <p className="zoom-animation">{message}</p>
     </div>
   );
 };
