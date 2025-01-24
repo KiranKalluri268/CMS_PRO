@@ -9,6 +9,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   const [pdf, setPdf] = useState(null);
   const token = localStorage.getItem('authToken');
   const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -23,6 +24,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const data = new FormData();
     data.append("rollNumber", studentId);
     data.append("organisation", formData.organisation);
@@ -52,7 +54,9 @@ const AddCertificate = ({ rollNumber: studentId }) => {
       } else {
         console.error("Failed to upload certificate:", error);
       }
-    }
+    } finally {
+      setLoading(false);
+  }
   };
 
   return (
@@ -87,7 +91,10 @@ const AddCertificate = ({ rollNumber: studentId }) => {
             <label htmlFor="pdf">Upload PDF:</label>
             <input id="pdf" type="file" accept="application/pdf" onChange={handleFileChange} />
           </div>
-          <button type="submit">Submit</button><br/>
+          <button type="submit" disabled={loading}>
+              {loading ? "Submitting..." : "Submit"}
+          </button>
+          <br/>
           <Link to={`/student-home/${decodedToken.userId}`}>Go back to home</Link>
         </form>
       </div>

@@ -8,6 +8,7 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [passwordRules, setPasswordRules] = useState({
     hasLength: false,
@@ -35,6 +36,7 @@ const Register = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     if (email.slice(0, 10).toLowerCase() !== rollNumber.toLowerCase()) {
       alert('Incorrect email or rollnumber');
@@ -56,7 +58,9 @@ const Register = () => {
     } catch (error) {
       console.error('Error during registration:', error);
       alert(error.response?.data?.message || 'Registration failed');
-    }
+    } finally {
+      setLoading(false);
+  }
   };
 
   return (
@@ -135,7 +139,9 @@ const Register = () => {
             </div>
           </div>
 
-          <button type="submit">Register</button>
+          <button type="submit" disabled={loading}>
+              {loading ? "Registering..." : "Register"}
+          </button>
           <br />
           <Link to="/">Already have an account? Login here</Link>
         </form>

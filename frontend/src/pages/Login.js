@@ -7,9 +7,12 @@ const Login = () => {
     const [rollNumber, setRollNumber] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
   
     const handleSubmit = async (event) => {
       event.preventDefault();
+      setError("");
+      setLoading(true);
     
       try {
         const response = await axios.post('/api/auth/login', {
@@ -19,8 +22,6 @@ const Login = () => {
     
         // Check if `response` and `response.data` exist
         if (response && response.data) {
-          console.log('Login successful:', response.data);
-        
           // Store the token in localStorage
           const token = response.data.token;
           localStorage.setItem('authToken', token);
@@ -48,7 +49,9 @@ const Login = () => {
       } catch (error) {
         console.error('Error during login:', error);
         setError(error.response?.data?.message || "Login failed. Please try again.");
-      }
+      } finally {
+        setLoading(false);
+    }
     };
 
   return (
@@ -84,7 +87,9 @@ const Login = () => {
             />
           </div>
           {error && <p style={{ color: 'red', margin: '10px 0' }}>{error}</p>}
-          <button type="submit">Login</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
           <br />
           <div className="links">
             <Link to="/forgot-password">Forgot Password?</Link>

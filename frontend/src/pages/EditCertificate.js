@@ -18,6 +18,7 @@ const EditCertificate = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
   const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
@@ -54,6 +55,7 @@ const EditCertificate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData();
     formData.append('organisation', certificate.organisation);
     formData.append('course', certificate.course);
@@ -84,7 +86,9 @@ const EditCertificate = () => {
       } else {
       console.error('Error updating certificate:', error);
       }
-    }
+    } finally {
+      setLoading(false);
+  }
   };
 
   const handleDelete = async () => {
@@ -183,9 +187,11 @@ const EditCertificate = () => {
           <br />
         </div>
         <div className="buttons">
-          <button type="submit">Save Changes</button>
-          <button type="button" onClick={handleDelete} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
-            Delete Certificate
+        <button type="submit" disabled={loading}>
+              {loading ? "Editing..." : "Save Changes"}
+          </button>
+          <button type="button" onClick={handleDelete} disabled={loading} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
+          {loading ? "Deleting..." : "Delete Certificate"}
           </button>
         </div>
         <Link to={`/student-home/${decodedToken.userId}`}>Go back to home</Link>
