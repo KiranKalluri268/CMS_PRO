@@ -8,6 +8,7 @@ const StudentHome = () => {
   const { rollNumber: studentId } = useParams();
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
   const token = localStorage.getItem('authToken');
   console.log("token in studenthome:", token);
 
@@ -19,6 +20,7 @@ const StudentHome = () => {
 
   useEffect(() => {
     const fetchCertificates = async () => {
+      setLoading(true);
       try {
         const res = await getCertificates(studentId, token);
         // Assuming the response contains metadata and downloadLink from Cloudinary
@@ -35,7 +37,9 @@ const StudentHome = () => {
         } else {
         console.error('Error fetching certificates:', error);
         }
-      }
+      } finally {
+        setLoading(false);
+    }
     };
     fetchCertificates();
   }, [studentId, token, navigate]);
@@ -125,7 +129,9 @@ const StudentHome = () => {
             </tr>
           </thead>
           <tbody>
-            {certificates.length > 0 ? (
+            {loading ? (
+              <p>Loading certificates...</p>
+              ) : certificates.length > 0 ? (
               certificates.map((cert, index) => {
                 const fromDate = new Date(cert.fromDate).toLocaleDateString();
                 const toDate = new Date(cert.toDate).toLocaleDateString();
