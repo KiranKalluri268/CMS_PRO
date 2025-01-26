@@ -187,11 +187,11 @@ const EditCertificate = () => {
           <br />
         </div>
         <div className="buttons">
-        <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading}>
               {loading ? "Editing..." : "Save Changes"}
           </button>
           <button type="button" onClick={handleDelete} disabled={loading} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
-          {loading ? "Deleting..." : "Delete Certificate"}
+            Delete
           </button>
         </div>
         <Link to={`/student-home/${decodedToken.userId}`}>Go back to home</Link>

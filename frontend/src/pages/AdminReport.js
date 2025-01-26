@@ -11,6 +11,7 @@ const AdminReport = () => {
   const [academicYear, setAcademicYear] = useState(""); // State for filtering by academic year
   const [years, setYears] = useState([]); // State for storing available academic years
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -21,6 +22,7 @@ const AdminReport = () => {
 
   useEffect(() => {
     const fetchCertificates = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`/api/admin/certificates?year=${batchYear}`, {
           headers: { "x-auth-token": localStorage.getItem("authToken") },
@@ -49,7 +51,9 @@ const AdminReport = () => {
         } else {
         console.error("Error fetching certificates:", error);
         }
-      }
+      } finally {
+        setLoading(false);
+    }
     };
 
     fetchCertificates();
@@ -168,56 +172,68 @@ const AdminReport = () => {
           Download Report as Excel
         </button>
 
-        {filteredCertificates.length > 0 ? (
-          <div className="table-wrapper">
-            <table className="report-table">
-              <thead>
-                <tr>
-                  <th>S.No</th>
-                  <th>Roll No</th>
-                  <th>Name</th>
-                  <th>Title of the event</th>
-                  <th>Organised by</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Academic Year</th>
-                  <th>Download</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCertificates.map((certificate, index) => (
-                  <tr key={certificate.certificateId}>
-                    <td>{index + 1}</td>
-                    <td>{certificate.student.rollNumber}</td>
-                    <td>{certificate.student.name}</td>
-                    <td>
-                      <span
-                        style={{ color: certificate.certificateLink ? 'blue' : 'black', cursor: certificate.certificateLink ? 'pointer' : 'default' }}
-                        onClick={() => handleCertificateLinkClick(certificate.certificateLink)}
-                      >
-                        {certificate.course}
-                      </span>
-                    </td>
-                    <td>{certificate.organisation}</td>
-                    <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
-                    <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
-                    <td>{new Date(certificate.toDate).getFullYear()}</td>
-                    <td>
-                      <button
-                        onClick={() => handleDownload(certificate.downloadLink, `${certificate.course}.pdf`)}
-                        disabled={!certificate.downloadLink}
-                      >
-                        {certificate.downloadLink ? "Download" : "No PDF Available"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p>No certificates found for this batch.</p>
-        )}
+        {loading ? (
+  <p>Loading certificates...</p>
+) : filteredCertificates.length > 0 ? (
+  <div className="table-wrapper">
+    <table className="report-table">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Title of the event</th>
+          <th>Organised by</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Academic Year</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredCertificates.map((certificate, index) => (
+          <tr key={certificate.certificateId}>
+            <td>{index + 1}</td>
+            <td>{certificate.student.rollNumber}</td>
+            <td>{certificate.student.name}</td>
+            <td>
+              <span
+                style={{
+                  color: certificate.certificateLink ? "blue" : "black",
+                  cursor: certificate.certificateLink ? "pointer" : "default",
+                }}
+                onClick={() =>
+                  handleCertificateLinkClick(certificate.certificateLink)
+                }
+              >
+                {certificate.course}
+              </span>
+            </td>
+            <td>{certificate.organisation}</td>
+            <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
+            <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
+            <td>{new Date(certificate.toDate).getFullYear()}</td>
+            <td>
+              <button
+                onClick={() =>
+                  handleDownload(
+                    certificate.downloadLink,
+                    `${certificate.course}.pdf`
+                  )
+                }
+                disabled={!certificate.downloadLink}
+              >
+                {certificate.downloadLink ? "Download" : "No PDF Available"}
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) : (
+  <p>No certificates found for this batch.</p>
+)}
       </div>
 
       <footer className="Adminreport-footer">
