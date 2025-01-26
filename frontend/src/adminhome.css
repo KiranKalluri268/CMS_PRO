@@ -12,6 +12,7 @@
 /* Header styling */
 .AdminHeader {
   background-color: #dfdddd65;
+  backdrop-filter: blur(5px);
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
@@ -52,7 +53,8 @@
 
 /* Style the box that contains the form */
 .batch-list {
-  background-color: #dfdddd65;
+  background-color: #dfdddd00;
+  backdrop-filter: blur(5px);
   color: #970f0f;
   padding: 1%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

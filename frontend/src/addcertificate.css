@@ -12,6 +12,7 @@
 /* Header styling */
 .AddCertificateHeader {
   background-color: #dfdddd65;
+  backdrop-filter: blur(5px);
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
@@ -36,7 +37,8 @@
 
 /* Style the box that contains the form */
 .upload-box {
-  background-color: #dfdddd65;
+  background-color: #dfdddd00;
+  backdrop-filter: blur(5px);
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
