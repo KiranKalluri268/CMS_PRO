@@ -6,6 +6,7 @@ import '../adminhome.css';
 const AdminHome = () => {
   const [batches, setBatches] = useState([]);
   const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const authToken = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
@@ -17,6 +18,7 @@ const AdminHome = () => {
 
   useEffect(() => {
     const fetchBatches = async () => {
+      setLoading(true);
       try {
         console.log("Token being sent:", localStorage.getItem("authToken"));
         const response = await axios.get("/api/admin/batches", {
@@ -33,7 +35,9 @@ const AdminHome = () => {
         } else {
         console.error("Error fetching batches:", error);
         }
-      }
+      } finally {
+        setLoading(false);
+    }
     };
     fetchBatches();
   }, [navigate]);
@@ -63,8 +67,10 @@ const AdminHome = () => {
   
       <div className="batch-list">
         <h2>Select a Batch</h2>
-        {console.log("Batches being rendered:", batches)} {/* Log batches here */}
-        {batches.length > 0 ? (
+        {console.log("Batches being rendered:", batches)}
+        {loading ? (
+        <p>Loading batches...</p>
+          ) : batches.length > 0 ? (
           <ul>
             {batches.map((batch) => (
               <li key={batch.year}>

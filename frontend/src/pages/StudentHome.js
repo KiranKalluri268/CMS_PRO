@@ -136,7 +136,7 @@ const StudentHome = () => {
                     <td>{index + 1}</td>
                     <td>
                       <span
-                        style={{ color: cert.certificateLink ? 'blue' : 'black', cursor: cert.certificateLink ? 'pointer' : 'default' }}
+                        style={{ color: cert.certificateLink ? '#970f0f'  : 'black', cursor: cert.certificateLink ? 'pointer' : 'point' }}
                         onClick={() => handleCertificateLinkClick(cert.certificateLink)}
                       >
                         {cert.course}

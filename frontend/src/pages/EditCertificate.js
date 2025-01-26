@@ -190,7 +190,7 @@ const EditCertificate = () => {
           <button type="submit" disabled={loading}>
               {loading ? "Editing..." : "Save Changes"}
           </button>
-          <button type="button" onClick={handleDelete} disabled={loading} style={{ marginLeft: '10px', backgroundColor: 'red' }}>
+          <button type="button" className='Delete' onClick={handleDelete} disabled={loading} >
             Delete
           </button>
         </div>

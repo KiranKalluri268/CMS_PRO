@@ -85,26 +85,26 @@ th, td {
 }
 
 th {
-  background-color: #4caf50;
+  background-color: #970f0fab;
   color: white;
   font-weight: bold;
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #f2f2f29d;
 }
 
 button {
   padding: 5px 10px;
   cursor: pointer;
   border: none;
-  background-color: #4caf50;
+  background-color: #e6bd39a8;
   color: white;
   border-radius: 5px;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #970f0f;
 }
 
 /* Footer styling */

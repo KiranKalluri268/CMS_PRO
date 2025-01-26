@@ -96,9 +96,16 @@
 
 /* Add hover effect to the button */
 .edit-box button:hover {
-  background-color: #970f0f;
+  background-color: #4caf50;
 }
 
+.Delete {
+  margin-left: 10px;
+}
+
+.Delete:hover {
+  background-color: #970f0f !important;
+}
 /* Style the heading */
 .edit-box h1 {
   font-size: 24px;
