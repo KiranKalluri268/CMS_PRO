@@ -172,6 +172,21 @@ exports.uploadCertificate = async (req, res) => {
       console.log("Uploaded PDF with Cloudinary public_id:", pdfId);
     }
 
+    console.log("Fetching student details for studentId:", metadata.studentId);
+
+    // Fetch student details to get the batchYear
+    const studentDetails = await dynamoDB.send(new GetCommand({
+      TableName: USERS_TABLE,
+      Key: { userId: metadata.studentId },
+    }));
+
+    if (!studentDetails.Item) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const batchYear = studentDetails.Item.batchYear;
+    console.log("Batch year for studentId:", metadata.studentId, "is:", batchYear);
+
     console.log("Item being sent to DynamoDB:", {
       certificateId: pdfId || null, // Use `null` if no PDF is uploaded
       studentId: metadata.studentId,
@@ -179,6 +194,7 @@ exports.uploadCertificate = async (req, res) => {
       course,
       fromDate,
       toDate,
+      batchYear,
       downloadLink: downloadLink || null, // Use `null` if no PDF is uploaded
       certificateLink: certificateLink || "", // Optional link from frontend
     });
@@ -187,12 +203,13 @@ exports.uploadCertificate = async (req, res) => {
     await dynamoDB.send(new PutCommand({
       TableName: CERTIFICATES_TABLE,
       Item: {
-        certificateId : pdfId || `cert-${Date.now()}`,
+        certificateId: pdfId || `cert-${Date.now()}`,
         studentId: metadata.studentId,
         organisation,
         course,
         fromDate,
         toDate,
+        batchYear,
         ...(downloadLink ? { downloadLink: downloadLink } : {}), // Include only if downloadLink exists
         ...(certificateLink ? { certificateLink: certificateLink } : {}), // Include only if certificateLink exists
       },
@@ -224,7 +241,7 @@ exports.uploadCertificate = async (req, res) => {
           const updatedCertificates = existingData.certificates || [];
           if (!updatedCertificates.includes(pdfId)) {
             updatedCertificates.push(pdfId);
-        
+
             await dynamoDB.send(new UpdateCommand({
               TableName: YEARS_TABLE,
               Key: { year: year },
@@ -244,7 +261,6 @@ exports.uploadCertificate = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Controller to get a certificate by ID
 exports.getCertificateById = async (req, res) => {

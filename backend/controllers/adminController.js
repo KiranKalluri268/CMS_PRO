@@ -16,7 +16,7 @@ const getBatches = async (req, res) => {
     }
 
     const batches = response.Items.map(item => ({
-      _id: item.batchId, // Adjust based on your table's attribute names
+      _id: item.batchId,
       year: item.year,
     }));
 
@@ -30,88 +30,106 @@ const getBatches = async (req, res) => {
 // Function to get certificates by batch ID
 const getCertificatesByBatch = async (req, res) => {
   try {
-    const { year } = req.query;
+    const { year, limit = 5 } = req.query;
+    let { lastEvaluatedKey } = req.query;
+    console.log("lastEvaluatedKey in back:", lastEvaluatedKey);
 
     if (!year) {
       return res.status(400).json({ message: "Year is required" });
     }
 
-    // Fetch the batch to get the list of student IDs
+    // Fetch batch details
     const batchParams = {
-      TableName: process.env.BATCHES_TABLE, // Replace with your batches table name
+      TableName: process.env.BATCHES_TABLE,
       Key: { year },
     };
-
     const batchResponse = await dynamoDB.send(new GetCommand(batchParams));
 
     if (!batchResponse.Item) {
       return res.status(404).json({ message: "Batch not found" });
     }
 
-    const studentIds = batchResponse.Item.students || []; // Assume students are stored as an array of IDs
+    const studentIds = batchResponse.Item.students || [];
     if (studentIds.length === 0) {
       return res.status(200).json({ message: "No students found in this batch", certificates: [] });
     }
 
     console.log(`Batch for year ${year} contains students:`, studentIds);
-    // Fetch certificates for the students in this batch using the studentId-index
-    let certificates = [];
 
-    // Query certificates for each studentId individually
-    for (const studentId of studentIds) {
-      const certificateParams = {
-        TableName: process.env.CERTIFICATES_TABLE,
-        IndexName: "studentId-index", // Use the existing GSI for studentId
-        KeyConditionExpression: "studentId = :studentId", // Query by a single studentId
-        ExpressionAttributeValues: {
-          ":studentId": studentId, // Pass the current studentId
-        },
-      };
+    // Validate lastEvaluatedKey
+    try {
+      lastEvaluatedKey = lastEvaluatedKey ? JSON.parse(lastEvaluatedKey) : undefined;
+    } catch (err) {
+      console.warn("Invalid lastEvaluatedKey received, resetting it:", lastEvaluatedKey);
+      console.log("Invalid lastEvaluatedKey received, resetting it:", lastEvaluatedKey);
 
-      const certificateResponse = await dynamoDB.send(new QueryCommand(certificateParams));
-      const studentCertificates = certificateResponse.Items || [];
-
-      // Fetch student details from Users table and add it to the certificate
-      for (const certificate of studentCertificates) {
-        const studentParams = {
-          TableName: process.env.USERS_TABLE, // Replace with your users table name
-          Key: {
-            userId: studentId, // Assuming the studentId is the same as userId
-          },
-        };
-
-        const studentResponse = await dynamoDB.send(new GetCommand(studentParams));
-
-        if (studentResponse.Item) {
-          const student = studentResponse.Item;
-          // Add student details (name and rollNumber) to the certificate
-          certificate.student = {
-            name: student.name,
-            rollNumber: student.rollNumber,
-          };
-        }
-
-        certificates.push(certificate); // Add the populated certificate
-      }
+      lastEvaluatedKey = undefined;
     }
+
+    // Fetch certificates
+    const certificateParams = {
+      TableName: process.env.CERTIFICATES_TABLE,
+      IndexName: "batchYear-toDate-index",
+      KeyConditionExpression: "batchYear = :batchYear",
+      ExpressionAttributeValues: {
+        ":batchYear": year,
+      },
+      Limit: Number(limit),
+      ScanIndexForward: false,
+      ExclusiveStartKey: lastEvaluatedKey,
+    };
+
+    console.log("Fetching certificates with params:", certificateParams);
+    const certificateResponse = await dynamoDB.send(new QueryCommand(certificateParams));
+    
+    let certificates = certificateResponse.Items || [];
+    console.log(`Certificates found:`, certificates.length);
+    console.log(`certificates:`, certificates);
 
     if (certificates.length === 0) {
-      return res.status(200).json({ message: "No certificates found for this batch", certificates: [] });
+      return res.status(200).json({ 
+        success: true, 
+        year, 
+        certificates: [], 
+        lastEvaluatedKey: null 
+      });
     }
 
-    console.log(`Certificates retrieved for year ${year}:`, certificates);
+    // Fetch student details in batch (Optimized)
+    const studentFetchPromises = certificates.map((cert) => {
+      const studentParams = {
+        TableName: process.env.USERS_TABLE,
+        Key: { userId: cert.studentId },
+      };
+      return dynamoDB.send(new GetCommand(studentParams));
+    });
+
+    const studentResponses = await Promise.all(studentFetchPromises);
+
+    certificates = certificates.map((certificate, index) => {
+      const studentData = studentResponses[index]?.Item;
+      if (studentData) {
+        certificate.student = {
+          name: studentData.name,
+          rollNumber: studentData.rollNumber,
+        };
+      }
+      return certificate;
+    });
+
+    console.log(`Returning ${certificates.length} certificates`);
 
     res.status(200).json({
       success: true,
       year,
       certificates,
+      lastEvaluatedKey: certificateResponse.LastEvaluatedKey ?? null, // Ensure null instead of undefined
     });
   } catch (error) {
     console.error("Error fetching certificates:", error);
     res.status(500).json({ message: "Error fetching certificates" });
   }
 };
-
 
 // Fetch all certificates
 const getAllCertificates = async (req, res) => {

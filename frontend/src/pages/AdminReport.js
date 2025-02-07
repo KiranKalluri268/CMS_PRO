@@ -12,6 +12,7 @@ const AdminReport = () => {
   const [years, setYears] = useState([]); // State for storing available academic years
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -20,44 +21,67 @@ const AdminReport = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    const fetchCertificates = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`/api/admin/certificates?year=${batchYear}`, {
-          headers: { "x-auth-token": localStorage.getItem("authToken") },
-        });
-
-        const certificates = Array.isArray(response.data.certificates) ? response.data.certificates : [];
-        const sortedCertificates = certificates.sort((a, b) => {
-          const dateA = new Date(a.toDate);
-          const dateB = new Date(b.toDate);
-          if (isNaN(dateA)) return 1;
-          if (isNaN(dateB)) return -1;
-          return dateA - dateB;
-        });
-
-        setCertificates(sortedCertificates);
-        setFilteredCertificates(sortedCertificates);
-
-        const uniqueYears = [...new Set(sortedCertificates.map(c => new Date(c.toDate).getFullYear()))];
-        setYears(uniqueYears);
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          // Token expired or authentication error
-          alert("Session expired. Please log in again.");
-          localStorage.removeItem("authToken"); // Clear the token
-          navigate("/"); // Redirect to login page
-        } else {
+  const fetchCertificates = async () => {
+    console.log("Fetching certificates...");
+    console.log("Current lastEvaluatedKey:", lastEvaluatedKey);
+  
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/admin/certificates`, {
+        params: {
+          year: batchYear,
+          lastEvaluatedKey: lastEvaluatedKey ? JSON.stringify(lastEvaluatedKey) : undefined, // Encode correctly
+        },
+        headers: { "x-auth-token": localStorage.getItem("authToken") },
+      });
+  
+      console.log("API Response:", response.data);
+  
+      const newCertificates = Array.isArray(response.data.certificates) ? response.data.certificates : [];
+  
+      if (newCertificates.length === 0 && !response.data.lastEvaluatedKey) {
+        console.log("No more certificates to fetch.");
+        setLastEvaluatedKey(null); // Ensure no further requests
+        return;
+      }
+  
+      // Append new certificates to the existing list
+      setCertificates((prevCertificates) => [...prevCertificates, ...newCertificates]);
+      setFilteredCertificates((prevFiltered) => [...prevFiltered, ...newCertificates]);
+  
+      console.log("Total certificates loaded:", newCertificates.length);
+  
+      // Extract unique academic years
+      const uniqueYears = [...new Set([...years, ...newCertificates.map(c => new Date(c.toDate).getFullYear())])];
+      setYears(uniqueYears);
+  
+      // Set lastEvaluatedKey for next request
+      setLastEvaluatedKey(response.data.lastEvaluatedKey || null);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        navigate("/");
+      } else {
         console.error("Error fetching certificates:", error);
-        }
-      } finally {
-        setLoading(false);
+      }
+    } finally {
+      setLoading(false);
     }
-    };
-
+  };
+  
+  // Run only on page load
+  useEffect(() => {
     fetchCertificates();
   }, [batchYear, navigate]);
+  
+  // Load More Button Handler
+  const handleLoadMore = () => {
+    if (lastEvaluatedKey) {
+      fetchCertificates();
+    }
+  };
+  
 
   const handleFilterChange = (event) => {
     const selectedYear = event.target.value;
@@ -233,6 +257,10 @@ const AdminReport = () => {
   </div>
 ) : (
   <p>No certificates found for this batch.</p>
+)}
+
+{lastEvaluatedKey && !loading && (
+  <button onClick={handleLoadMore}>Load More</button>
 )}
       </div>
 

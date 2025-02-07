@@ -10,6 +10,8 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   const token = localStorage.getItem('authToken');
   const decodedToken = JSON.parse(atob(token.split('.')[1]));
   const [loading, setLoading] = useState(false);
+  const [organisation, setOrganisation] = useState("");
+  const [customOrganisation, setCustomOrganisation] = useState("");
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -21,30 +23,51 @@ const AddCertificate = ({ rollNumber: studentId }) => {
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
   const handleFileChange = (e) => setPdf(e.target.files[0]);
+  
+  const handleDropdownChange = (e) => {
+    setOrganisation(e.target.value);
+    if (e.target.value !== "Other") {
+      setCustomOrganisation("");
+    }
+  };
+
+  const handleCustomOrganisationChange = (e) => {
+    setCustomOrganisation(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+  
+    const organisationToSend =
+      organisation === "Other" ? customOrganisation : organisation;
+  
+    // Prepare form data
     const data = new FormData();
     data.append("rollNumber", studentId);
-    data.append("organisation", formData.organisation);
+    data.append("organisation", organisationToSend);
     data.append("course", formData.course);
     data.append("fromDate", formData.fromDate);
     data.append("toDate", formData.toDate);
+  
+    // Handle certificate link or PDF upload
     if (formData.certificateLink) {
       data.append("certificateLink", formData.certificateLink);
-      data.append("pdf", pdf);
-    } else {
+    }
+    if (pdf) {
       data.append("pdf", pdf);
     }
-
+  
     try {
       const token = localStorage.getItem("authToken");
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       const studentId = decodedToken.userId;
-
+  
+      // Call the API to upload the certificate
       await uploadCertificate(data, token);
       alert("Certificate uploaded successfully");
+  
+      // Redirect to student home
       window.location.href = `/student-home/${studentId}`;
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -56,8 +79,8 @@ const AddCertificate = ({ rollNumber: studentId }) => {
       }
     } finally {
       setLoading(false);
-  }
-  };
+    }
+  };  
 
   return (
     <div className="upload-form-container">
@@ -72,9 +95,38 @@ const AddCertificate = ({ rollNumber: studentId }) => {
             <input id="Course" type="text" name="course" onChange={handleChange} placeholder="Enter Title of Event" required />
           </div>
           <div className="input-group">
-            <label htmlFor="organisation">Organised by:</label>
-            <input id="organisation" type="text" name="organisation" onChange={handleChange} placeholder="Enter Name of Organisation" required />
-          </div>
+  <label htmlFor="organisation-dropdown">Organised by:</label>
+  <select
+    id="organisation-dropdown"
+    name="organisation"
+    value={organisation}
+    onChange={handleDropdownChange}
+    required
+  >
+    <option value="" disabled>
+      Select Organisation
+    </option>
+    <option value="Cisco">Cisco</option>
+    <option value="MongoDB">MongoDB</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
+
+{organisation === "Other" && (
+  <div className="input-group">
+    <label htmlFor="custom-organisation">Enter Organisation Name:</label>
+    <input
+      id="custom-organisation"
+      type="text"
+      name="customOrganisation"
+      value={customOrganisation}
+      onChange={handleCustomOrganisationChange}
+      placeholder="Enter Name of Organisation"
+      required
+    />
+  </div>
+)}
+
           <div className="input-group">
             <label htmlFor="fromDate">From:</label>
             <input id="fromDate" type="date" name="fromDate" onChange={handleChange} required />
