@@ -37,8 +37,11 @@ export const uploadCertificate = (data, token) => {
 };
 
 // Fetch certificates for a specific student using their roll number (Authenticated)
-export const getCertificates = (studentId, token) => {
+export const getCertificates = (studentId, token, lastEvaluatedKey) => {
   return API.get(`/api/certificates/student/${studentId}`, {
+    params: {
+      lastEvaluatedKey,
+    },
     headers: {
       "x-auth-token": token,
     },

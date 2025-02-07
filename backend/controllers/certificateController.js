@@ -117,26 +117,31 @@ exports.updateCertificate = async (req, res) => {
 // Fetch certificates for a specific student
 exports.getCertificatesByStudent = async (req, res) => {
   const studentId = req.studentId;
+  const { lastEvaluatedKey } = req.query; // Retrieve pagination key from request
 
   try {
-    const response = await dynamoDB.send(
-      new QueryCommand({
-        TableName: CERTIFICATES_TABLE,
-        IndexName: "studentId-index",
-        KeyConditionExpression: "studentId = :studentId",
-        ExpressionAttributeValues: marshall({
-          ":studentId": studentId,
-        }),
-      })
-    );
+    const params = {
+      TableName: CERTIFICATES_TABLE,
+      IndexName: "studentId-index",
+      KeyConditionExpression: "studentId = :studentId",
+      ExpressionAttributeValues: marshall({
+        ":studentId": studentId,
+      }),
+      Limit: 10, // Limit number of certificates per request
+    };
+
+    if (lastEvaluatedKey) {
+      params.ExclusiveStartKey = JSON.parse(lastEvaluatedKey);
+    }
+
+    const response = await dynamoDB.send(new QueryCommand(params));
 
     const certificates = response.Items.map(item => unmarshall(item));
 
-    if (certificates.length === 0) {
-      return res.status(404).json({ message: "No certificates found for this student." });
-    }
-
-    res.status(200).json(certificates);
+    res.status(200).json({
+      certificates,
+      lastEvaluatedKey: response.LastEvaluatedKey ? JSON.stringify(response.LastEvaluatedKey) : null,
+    });
   } catch (error) {
     console.error("Error fetching certificates:", error);
     res.status(500).json({ message: "Server error" });

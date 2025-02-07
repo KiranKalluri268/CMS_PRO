@@ -8,7 +8,8 @@ const StudentHome = () => {
   const { rollNumber: studentId } = useParams();
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
   const token = localStorage.getItem('authToken');
   console.log("token in studenthome:", token);
 
@@ -18,31 +19,41 @@ const StudentHome = () => {
     }
   }, [navigate, token]);
 
-  useEffect(() => {
-    const fetchCertificates = async () => {
-      setLoading(true);
-      try {
-        const res = await getCertificates(studentId, token);
-        // Assuming the response contains metadata and downloadLink from Cloudinary
-        const sortedCertificates = (res.data || []).sort(
-          (a, b) => new Date(a.toDate) - new Date(b.toDate)
-        );
-        setCertificates(sortedCertificates);
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          // Token expired or authentication error
-          alert("Session expired. Please log in again.");
-          localStorage.removeItem("authToken"); // Clear the token
-          navigate("/"); // Redirect to login page
-        } else {
+  const fetchCertificates = async () => {
+    if (loading) return; // Prevent multiple requests at the same time
+
+    setLoading(true);
+    try {
+      const res = await getCertificates(studentId, token, lastEvaluatedKey);
+
+      const newCertificates = Array.isArray(res.data.certificates) ? res.data.certificates : [];
+      const sortedCertificates = [...certificates, ...newCertificates].sort(
+        (a, b) => new Date(a.toDate) - new Date(b.toDate)
+      );
+
+      setCertificates(sortedCertificates);
+      setLastEvaluatedKey(res.data.lastEvaluatedKey || null);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem("authToken");
+        navigate("/");
+      } else {
         console.error('Error fetching certificates:', error);
-        }
-      } finally {
-        setLoading(false);
+      }
+    } finally {
+      setLoading(false);
     }
-    };
+  };
+  useEffect(() => {
     fetchCertificates();
   }, [studentId, token, navigate]);
+
+  const handleLoadMore = () => {
+    if (lastEvaluatedKey) {
+      fetchCertificates();
+    }
+  };
 
   const handleDownload = async (downloadLink, fileName) => {
     if (!downloadLink) {
@@ -174,6 +185,9 @@ const StudentHome = () => {
           </tbody>
         </table>
         </div>
+        {lastEvaluatedKey && !loading && (
+          <button className='Loadmore' onClick={handleLoadMore}>Load More</button>
+        )}
       </div>
 
       {/* Footer Section */}

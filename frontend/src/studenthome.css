@@ -103,6 +103,12 @@ button {
   border-radius: 5px;
 }
 
+.Loadmore {
+  width: 100px;
+  align-self: center;
+  margin-top: 5px;
+}
+
 button:hover {
   background-color: #970f0f;
 }
