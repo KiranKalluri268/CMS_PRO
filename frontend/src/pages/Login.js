@@ -100,6 +100,10 @@ const Login = () => {
       </div>
 
       <footer className="footer">
+      <div className="footer-info">
+        <p className="footer-left">Developed by: Kalluri Saikiran<br/>Under the guidance of: Dr. C Madan Kumar</p>
+        <p className="footer-right">HoD: Dr.N.Sathyavathi</p>
+      </div>
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>
     </div>

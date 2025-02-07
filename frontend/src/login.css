@@ -120,6 +120,30 @@
   font-size: 14px;
 }
 
+.footer-info {
+  position: relative;
+  font-weight: bolder;
+  width: 92%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 50px; /* Adjust padding as needed */
+  font-size: 14px;
+  color: #525151; /* Adjust color */
+}
+
+.footer-left {
+  text-align: left;
+  position: absolute;
+  bottom: 50px; /* Position above the footer */
+  left: 20px; /* Align to the left */
+}
+
+.footer-right {
+  position: absolute;
+  bottom: 48px; /* Position above the footer */
+  right: 1px; /* Align to the right */
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .LoginHeader-logo {
@@ -136,6 +160,24 @@
 
   .login-box button {
     width: 30%; /* Adjust button width for smaller screens */
+  }
+
+  .footer-info {
+    width: 60%;
+  }
+  
+  .footer-left {
+    text-align: left;
+    position: absolute;
+    bottom: 58px; /* Position above the footer */
+    left: 20px; /* Align to the left */
+  }
+  
+  .footer-right {
+    position: absolute;
+    text-align: left;
+    bottom: 40px; /* Position above the footer */
+    left: 20px; /* Align to the right */
   }
 }
 
