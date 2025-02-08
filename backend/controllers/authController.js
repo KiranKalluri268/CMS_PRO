@@ -82,6 +82,8 @@ exports.register = async (req, res) => {
 
     // Create the new user
     const userId = uuidv4();
+    const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+
     const newUser = {
       userId,
       name,
@@ -91,6 +93,7 @@ exports.register = async (req, res) => {
       role: "student",
       batchYear: year,
       isVerified: false,
+      CreatedTime: timestamp,
     };
     await addItem(USERS_TABLE, newUser);  // Use addItem function
 
