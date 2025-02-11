@@ -61,24 +61,6 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const year = "20" + rollNumber.substring(0, 2);
-
-    // Check if batch exists
-    console.log(marshall)
-    const batchParams = {
-      TableName: BATCHES_TABLE,
-      Key: marshall({ year }),
-    };
-    const batchData = await dynamoDB.send(new GetItemCommand(batchParams));
-
-    if (!batchData.Item) {
-      // Create new batch if it doesn't exist
-      const newBatch = {
-        year,
-        students: [],
-      };
-      await addItem(BATCHES_TABLE, newBatch);  // Use addItem function
-    }
 
     // Create the new user
     const userId = uuidv4();
@@ -92,23 +74,11 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       role: "student",
-      batchYear: year,
+      batchYear: null,
       isVerified: false,
       CreatedTime: timestamp,
     };
     await addItem(USERS_TABLE, newUser);
-
-    // Add user to batch
-    const updateBatchParams = {
-      TableName: BATCHES_TABLE,
-      Key: marshall({ year }),
-      UpdateExpression: "SET students = list_append(if_not_exists(students, :emptyList), :newStudent)",
-      ExpressionAttributeValues: marshall({
-        ":emptyList": [],
-        ":newStudent": [userId],
-      }),
-    };
-    await dynamoDB.send(new UpdateItemCommand(updateBatchParams));
 
     // Create email verification token
     const token = crypto.randomBytes(32).toString("hex");
@@ -167,6 +137,61 @@ exports.verifyEmail = async (req, res) => {
       return res.status(400).send({ message: "Verification link has expired." });
     }
 
+    // Retrieve the user
+    const userParams = {
+      TableName: USERS_TABLE,
+      Key: marshall({ userId }),
+    };
+    const userData = await dynamoDB.send(new GetItemCommand(userParams));
+
+    if (!userData.Item) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const user = unmarshall(userData.Item);
+    const year = "20" + user.rollNumber.substring(0, 2); // Extract batch year
+
+    // Mark user as verified
+    const updateUserParams = {
+      TableName: USERS_TABLE,
+      Key: marshall({ userId }),
+      UpdateExpression: "SET isVerified = :isVerified, batchYear = :batchYear",
+      ExpressionAttributeValues: marshall({
+        ":isVerified": true,
+        ":batchYear": year,
+      }),
+    };
+    await dynamoDB.send(new UpdateItemCommand(updateUserParams));
+
+    // Check if batch exists
+    const batchParams = {
+      TableName: BATCHES_TABLE,
+      Key: marshall({ year }),
+    };
+    const batchData = await dynamoDB.send(new GetItemCommand(batchParams));
+
+    if (!batchData.Item) {
+      // Create new batch if it doesn't exist
+      const newBatch = {
+        year,
+        students: [userId],
+      };
+      await addItem(BATCHES_TABLE, newBatch);
+    } else {
+      // Add user to existing batch
+      const updateBatchParams = {
+        TableName: BATCHES_TABLE,
+        Key: marshall({ year }),
+        UpdateExpression: "SET students = list_append(if_not_exists(students, :emptyList), :newStudent)",
+        ExpressionAttributeValues: marshall({
+          ":emptyList": [],
+          ":newStudent": [userId],
+        }),
+      };
+      await dynamoDB.send(new UpdateItemCommand(updateBatchParams));
+    }
+
+
     // Mark token as used
     const updateTokenParams = {
       TableName: VERIFICATION_TOKENS_TABLE,
@@ -178,27 +203,7 @@ exports.verifyEmail = async (req, res) => {
     };
     await dynamoDB.send(new UpdateItemCommand(updateTokenParams));
 
-    const userParams = {
-      TableName: USERS_TABLE,
-      Key: marshall({ userId }),
-    };
-    const userData = await dynamoDB.send(new GetItemCommand(userParams));
-    if (!userData.Item) {
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    // Mark user as verified
-    const updateUserParams = {
-      TableName: USERS_TABLE,
-      Key: marshall({ userId }),
-      UpdateExpression: "SET isVerified = :isVerified",
-      ExpressionAttributeValues: marshall({
-        ":isVerified": true,
-      }),
-    };
-    await dynamoDB.send(new UpdateItemCommand(updateUserParams));
-
-    res.send({ message: "Email verified successfully!" });
+    res.send({ message: "Email verified successfully! Batch assigned." });
   } catch (error) {
     console.error("Error during email verification:", error);
     res.status(500).send({ message: "Email verification failed", error });

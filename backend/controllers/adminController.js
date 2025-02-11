@@ -84,7 +84,6 @@ const getCertificatesByBatch = async (req, res) => {
     
     let certificates = certificateResponse.Items || [];
     console.log(`Certificates found:`, certificates.length);
-    console.log(`certificates:`, certificates);
 
     if (certificates.length === 0) {
       return res.status(200).json({ 
@@ -119,6 +118,7 @@ const getCertificatesByBatch = async (req, res) => {
     });
 
     console.log(`Returning ${certificates.length} certificates`);
+    console.log("certificates",certificates);
 
     res.status(200).json({
       success: true,
