@@ -6,9 +6,10 @@ const adminRoutes = require("./routes/admin");
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 const path = require("path");
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");  // AWS SDK v3 client
-const { DynamoDBDocumentClient, GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb"); // AWS SDK v3 Document Client
+const { DynamoDBDocumentClient, GetCommand, PutCommand,UpdateCommand } = require("@aws-sdk/lib-dynamodb"); // AWS SDK v3 Document Client
+const { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand } = require('@aws-sdk/client-dynamodb');
 const Cloudinary = require('cloudinary').v2;
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');//temp
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ const dynamoDBClient = new DynamoDBClient({
   },
 });
 const dynamoDB = DynamoDBDocumentClient.from(dynamoDBClient); // Use DynamoDBDocumentClient for working with JavaScript objects
+const USERS_TABLE = process.env.USERS_TABLE || "Users";//temp
 
 
 // To verify email functionality
@@ -61,7 +63,31 @@ app.get('/', (req, res) => {
 app.use("/api/auth", authRoutes);  // For authentication (register/login)
 app.use("/api/certificates", certificateRoutes);  // For certificates
 app.use("/api/admin", adminRoutes);  // For admin functionalities
+//temporary
+app.post("/api/update-gender", async (req, res) => {
+  try {
+    const { userId, gender } = req.body; // Ensure you're sending `userId`
 
+    if (!userId || !gender) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const params = {
+      TableName: USERS_TABLE,
+      Key: { userId: { S: userId } },  // Use correct primary key
+      UpdateExpression: "SET gender = :gender",
+      ExpressionAttributeValues: { ":gender": { S: gender } }, // Ensure correct format
+    };
+
+    await dynamoDB.send(new UpdateItemCommand(params));
+
+    res.status(200).json({ message: "Gender updated successfully!" });
+  } catch (error) {
+    console.error("Error updating gender:", error);
+    res.status(500).json({ message: "Failed to update gender", error });
+  }
+});
+//
 // Error handling middleware
 app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message });

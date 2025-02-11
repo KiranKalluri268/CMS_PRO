@@ -31,11 +31,16 @@ const Login = () => {
           console.log("Decoded in frontend login:",decodedToken);
           const userRole = decodedToken.userRole; // Extract the role from the token
           const userRollNumber = decodedToken.userRollnumber;
+          const userGender = decodedToken.userGender;
 
           console.log('Decoded rollNumber:', userRollNumber);
           console.log('Decoded user role:', userRole);
+          console.log('Decoded user gender:', userGender);
         
           // Redirect based on userRole
+          if(!userGender){
+            window.location.href = '/update-gender';
+          }else{
           if (userRole === 'student') {
             window.location.href = `/student-home/${decodedToken.userId}`; // Assuming userId is rollNumber
           } else if (userRole === 'admin') {
@@ -43,9 +48,10 @@ const Login = () => {
           } else {
             console.error('Unknown role. Cannot navigate.');
           }
+        }
         } else {
           console.log('Unexpected response structure:', response);
-        }
+      }
       } catch (error) {
         console.error('Error during login:', error);
         setError(error.response?.data?.message || "Login failed. Please try again.");

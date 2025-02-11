@@ -8,6 +8,7 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [passwordRules, setPasswordRules] = useState({
@@ -49,6 +50,7 @@ const Register = () => {
         email,
         name,
         password,
+        gender,
       });
 
       if (response && response.data) {
@@ -96,6 +98,23 @@ const Register = () => {
               onChange={(e) => setName(e.target.value)}
               required
             />
+          </div>
+
+          <div className="input-group">
+          <label htmlFor="gender-dropdown">Gender:</label>
+          <select
+          id="gender-dropdown"
+          name="gender"
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          required
+          >
+          <option value="" disabled>
+          Select gender
+          </option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          </select>
           </div>
 
           <div className="register-input-group">

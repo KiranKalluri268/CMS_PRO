@@ -52,7 +52,7 @@ const AdminReport = () => {
       console.log("Total certificates loaded:", newCertificates.length);
   
       // Extract unique academic years
-      const uniqueYears = [...new Set([...years, ...newCertificates.map(c => new Date(c.toDate).getFullYear())])];
+      const uniqueYears = [...new Set([...years, ...newCertificates.map(c => getAcademicYear(c.toDate))])];
       setYears(uniqueYears);
   
       // Set lastEvaluatedKey for next request
@@ -86,17 +86,18 @@ const AdminReport = () => {
   const handleFilterChange = (event) => {
     const selectedYear = event.target.value;
     setAcademicYear(selectedYear);
-
+  
     if (selectedYear) {
       const filtered = certificates.filter(certificate => {
-        const toDateYear = new Date(certificate.toDate).getFullYear();
-        return toDateYear === parseInt(selectedYear);
+        const academicYear = getAcademicYear(certificate.toDate); // Use the same function for consistency
+        return academicYear === selectedYear;
       });
       setFilteredCertificates(filtered);
     } else {
       setFilteredCertificates(certificates);
     }
   };
+  
 
   const handleDownload = async (downloadLink, fileName) => {
     if (!downloadLink) {
@@ -129,6 +130,48 @@ const AdminReport = () => {
     }
   };
 
+  const getAcademicYear = (date) => {
+    const toDate = new Date(date);
+    const year = toDate.getFullYear();
+    const month = toDate.getMonth() + 1; // JavaScript months are 0-based
+  
+    return month >= 6 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+  };
+
+  const calculateDuration = (fromDate, toDate) => {
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+  
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    let days = end.getDate() - start.getDate();
+  
+    // Adjust for negative days
+    if (days < 0) {
+      months -= 1;
+      let prevMonth = new Date(end.getFullYear(), end.getMonth(), 0); // Last day of the previous month
+      days += prevMonth.getDate();
+    }
+  
+    // Adjust for negative months
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+  
+    // Convert remaining days to weeks
+    let weeks = Math.floor(days / 7);
+    days = days % 7; // Remaining days after weeks are counted
+  
+    // Construct the result string
+    let durationStr = [];
+    if (years > 0) durationStr.push(`${years} year${years > 1 ? "s" : ""}`);
+    if (months > 0) durationStr.push(`${months} month${months > 1 ? "s" : ""}`);
+    if (weeks > 0) durationStr.push(`${weeks} week${weeks > 1 ? "s" : ""}`);
+    if (days > 0) durationStr.push(`${days} day${days > 1 ? "s" : ""}`);
+  
+    return durationStr.length > 0 ? durationStr.join("-") : "0 days";
+  };
 
   const handleDownloadExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
@@ -136,11 +179,13 @@ const AdminReport = () => {
         SNo: index + 1,
         RollNo: certificate.student.rollNumber,
         Name: certificate.student.name,
+        Gender: certificate.student.gender,
         Organisation: certificate.organisation,
         Course: certificate.course,
         FromDate: new Date(certificate.fromDate).toLocaleDateString(),
         ToDate: new Date(certificate.toDate).toLocaleDateString(),
-        AcademicYear: new Date(certificate.toDate).getFullYear(),
+        AcademicYear: getAcademicYear(certificate.toDate),
+        Duration: calculateDuration(certificate.fromDate, certificate.toDate),
       }))
     );
 
@@ -206,11 +251,13 @@ const AdminReport = () => {
           <th>S.No</th>
           <th>Roll No</th>
           <th>Name</th>
+          <th>Gender</th>
           <th>Title of the event</th>
           <th>Organised by</th>
           <th>From</th>
           <th>To</th>
           <th>Academic Year</th>
+          <th>Duration</th>
           <th>Download</th>
         </tr>
       </thead>
@@ -220,6 +267,7 @@ const AdminReport = () => {
             <td>{index + 1}</td>
             <td>{certificate.student.rollNumber}</td>
             <td>{certificate.student.name}</td>
+            <td>{certificate.student.gender}</td>
             <td>
               <span
                 style={{
@@ -236,7 +284,8 @@ const AdminReport = () => {
             <td>{certificate.organisation}</td>
             <td>{new Date(certificate.fromDate).toLocaleDateString()}</td>
             <td>{new Date(certificate.toDate).toLocaleDateString()}</td>
-            <td>{new Date(certificate.toDate).getFullYear()}</td>
+            <td>{getAcademicYear(certificate.toDate)}</td>
+            <td>{calculateDuration(certificate.fromDate, certificate.toDate)}</td>
             <td>
               <button
                 onClick={() =>

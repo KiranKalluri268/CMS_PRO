@@ -41,6 +41,16 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   
     const organisationToSend =
       organisation === "Other" ? customOrganisation : organisation;
+
+    // Validate date range
+    const fromDate = new Date(formData.fromDate);
+    const toDate = new Date(formData.toDate);
+
+    if (fromDate >= toDate) {
+      alert("Error: 'From Date' must be before 'To Date'.");
+      setLoading(false);
+      return;
+    }
   
     // Prepare form data
     const data = new FormData();
@@ -80,7 +90,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
     } finally {
       setLoading(false);
     }
-  };  
+  }; 
 
   return (
     <div className="upload-form-container">

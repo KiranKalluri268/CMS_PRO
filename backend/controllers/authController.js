@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 // Register Function
 exports.register = async (req, res) => {
   try {
-    const { name, rollNumber, email, password } = req.body;
+    const { name, rollNumber, email, password, gender } = req.body;
 
     // Check if rollNumber already exists
     const checkRollNumberParams = {
@@ -88,6 +88,7 @@ exports.register = async (req, res) => {
       userId,
       name,
       rollNumber,
+      gender,
       email,
       password: hashedPassword,
       role: "student",
@@ -95,7 +96,7 @@ exports.register = async (req, res) => {
       isVerified: false,
       CreatedTime: timestamp,
     };
-    await addItem(USERS_TABLE, newUser);  // Use addItem function
+    await addItem(USERS_TABLE, newUser);
 
     // Add user to batch
     const updateBatchParams = {
@@ -242,7 +243,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.userId,userRollnumber: user.rollNumber, userName: user.name, userRole: user.role },
+      { userId: user.userId,userRollnumber: user.rollNumber, userName: user.name, userRole: user.role, userGender: user.gender },
       "secret_key_of_cms",
       { expiresIn: "1h" }
     );

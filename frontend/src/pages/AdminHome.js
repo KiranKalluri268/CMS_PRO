@@ -24,8 +24,13 @@ const AdminHome = () => {
         const response = await axios.get("/api/admin/batches", {
             headers: { "x-auth-token": localStorage.getItem("authToken") },
           });
-          console.log("Batches fetched:", response.data); 
-        setBatches(response.data.batches);
+          console.log("Batches fetched:", response.data);
+          // Sort batches numerically based on the "year" field
+          const sortedBatches = response.data.batches.sort(
+            (a, b) => parseInt(a.year) - parseInt(b.year)
+          );
+        console.log("Batches sorted:", sortedBatches);
+        setBatches(sortedBatches);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           // Token expired or authentication error
