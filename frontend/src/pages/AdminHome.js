@@ -72,6 +72,7 @@ const AdminHome = () => {
   
       <div className="batch-list">
         <h2>Select a Batch</h2>
+        <div className="batchlist">
         {console.log("Batches being rendered:", batches)}
         {loading ? (
         <p>Loading batches...</p>
@@ -88,6 +89,7 @@ const AdminHome = () => {
         ) : (
           <p>No batches available at the moment.</p>
         )}
+        </div>
       </div>
   
       {/* Footer Section */}

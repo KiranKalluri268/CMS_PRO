@@ -65,6 +65,19 @@
   flex-direction: column;
   align-items: center;
   top: 0px;
+  max-height: 300px;
+}
+
+.batchlist {
+  width: 200px;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer/Edge */
+}
+
+/* Hide scrollbar for WebKit browsers */
+.batchlist::-webkit-scrollbar {
+  display: none;
 }
 
 .batch-list ul {
