@@ -66,7 +66,9 @@ app.use("/api/admin", adminRoutes);  // For admin functionalities
 //temporary
 app.post("/api/update-gender", async (req, res) => {
   try {
-    const { userId, gender } = req.body; // Ensure you're sending `userId`
+    console.log("Request Body:", req.body); // Debugging
+
+    const { userId, gender } = req.body;
 
     if (!userId || !gender) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -74,9 +76,9 @@ app.post("/api/update-gender", async (req, res) => {
 
     const params = {
       TableName: USERS_TABLE,
-      Key: { userId: { S: userId } },  // Use correct primary key
+      Key: { userId: { S: userId } }, // Ensure primary key matches DynamoDB
       UpdateExpression: "SET gender = :gender",
-      ExpressionAttributeValues: { ":gender": { S: gender } }, // Ensure correct format
+      ExpressionAttributeValues: { ":gender": { S: gender } },
     };
 
     await dynamoDB.send(new UpdateItemCommand(params));

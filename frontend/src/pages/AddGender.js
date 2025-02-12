@@ -27,38 +27,43 @@ const AddGender = () => {
     setLoading(true);
 
     try {
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        const userId = decodedToken.userId;
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("No authentication token found. Please log in again.");
+            window.location.href = "/";
+            return;
+        }
 
-      if (!userId) {
-        alert("UserId Not Found!");
-        return;
-      }
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        const userId = decodedToken?.userId;
 
-      const response = await fetch("/api/update-gender", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, gender: selectedGender }),
-      });
+        if (!userId) {
+            alert("UserId Not Found!");
+            return;
+        }
 
-      const data = await response.json();
-    if (response.ok) {
-      alert("Gender updated successfully!");
-      localStorage.removeItem("authToken");
-      window.location.href = `/`;
-    } else {
-      alert(data.message);
-    }
+        const response = await axios.post("/api/update-gender",
+            { userId, gender: selectedGender },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`, // If authentication is required
+                },
+            }
+        );
 
+        console.log("Response:", response.data);
+        alert(response.data.message);
+
+        localStorage.removeItem("authToken");
+        window.location.href = `/`; // Redirect to login after logout
     } catch (error) {
-      console.error("Error updating gender:", error);
-      alert("Failed to update gender!");
+        console.error("Error updating gender:", error);
+        alert(error.response?.data?.message || "Failed to update gender!");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   return (
     <div className="admin-home-container">
