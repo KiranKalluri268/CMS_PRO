@@ -305,9 +305,8 @@ const AdminReport = () => {
       </tbody>
     </table>
   </div>
-) : (
-  <p>No certificates found for this batch.</p>
-)}
+) : !loading && <p>No certificates found for this batch.</p>}
+
 {loading && <p>Loading certificates...</p>}
       </div>
       <footer className="Adminreport-footer">
