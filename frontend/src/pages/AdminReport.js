@@ -21,28 +21,36 @@ const AdminReport = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    let isFetching = false;
+
   const fetchCertificates = async () => {
     console.log("Fetching certificates...");
     console.log("Current lastEvaluatedKey:", lastEvaluatedKey);
   
-    setLoading(true);
-    try {
+    if (isFetching) return; // Prevent multiple concurrent calls
+      isFetching = true;
+      setLoading(true);
+      let nextKey = lastEvaluatedKey;
+
+      try {
+        do {
       const response = await axios.get(`/api/admin/certificates`, {
         params: {
           year: batchYear,
-          lastEvaluatedKey: lastEvaluatedKey ? JSON.stringify(lastEvaluatedKey) : undefined, // Encode correctly
+          lastEvaluatedKey: nextKey ? JSON.stringify(nextKey) : undefined, // Encode correctly
         },
         headers: { "x-auth-token": localStorage.getItem("authToken") },
       });
   
       console.log("API Response:", response.data);
   
-      const newCertificates = Array.isArray(response.data.certificates) ? response.data.certificates : [];
-  
+
+      const newCertificates = response.data.certificates || [];  
       if (newCertificates.length === 0 && !response.data.lastEvaluatedKey) {
         console.log("No more certificates to fetch.");
         setLastEvaluatedKey(null); // Ensure no further requests
-        return;
+        break;
       }
   
       // Append new certificates to the existing list
@@ -56,7 +64,9 @@ const AdminReport = () => {
       setYears(uniqueYears);
   
       // Set lastEvaluatedKey for next request
-      setLastEvaluatedKey(response.data.lastEvaluatedKey || null);
+      nextKey = response.data.lastEvaluatedKey || null;
+      setLastEvaluatedKey(nextKey);
+    } while (nextKey);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         alert("Session expired. Please log in again.");
@@ -67,20 +77,13 @@ const AdminReport = () => {
       }
     } finally {
       setLoading(false);
+      isFetching = false;
     }
   };
   
   // Run only on page load
-  useEffect(() => {
-    fetchCertificates();
+  fetchCertificates();
   }, [batchYear, navigate]);
-  
-  // Load More Button Handler
-  const handleLoadMore = () => {
-    if (lastEvaluatedKey) {
-      fetchCertificates();
-    }
-  };
   
 
   const handleFilterChange = (event) => {
@@ -241,9 +244,7 @@ const AdminReport = () => {
           Download Report as Excel
         </button>
 
-        {loading ? (
-  <p>Loading certificates...</p>
-) : filteredCertificates.length > 0 ? (
+        {filteredCertificates.length > 0 ? (
   <div className="table-wrapper">
     <table className="report-table">
       <thead>
@@ -307,12 +308,8 @@ const AdminReport = () => {
 ) : (
   <p>No certificates found for this batch.</p>
 )}
-
-{lastEvaluatedKey && !loading && (
-  <button onClick={handleLoadMore}>Load More</button>
-)}
+{loading && <p>Loading certificates...</p>}
       </div>
-
       <footer className="Adminreport-footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>
