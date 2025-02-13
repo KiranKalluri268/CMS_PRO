@@ -30,7 +30,7 @@ const getBatches = async (req, res) => {
 // Function to get certificates by batch ID
 const getCertificatesByBatch = async (req, res) => {
   try {
-    const { year, limit = 2 } = req.query;
+    const { year, limit = 10 } = req.query;
     let { lastEvaluatedKey } = req.query;
     console.log("lastEvaluatedKey in back:", lastEvaluatedKey);
 
