@@ -126,9 +126,8 @@
   width: 92%;
   display: flex;
   justify-content: space-between;
-  padding: 10px 50px; /* Adjust padding as needed */
-  font-size: 14px;
-  color: #525151; /* Adjust color */
+  padding: 10px 50px;
+  color: #525151;
 }
 
 .footer-left {
@@ -142,6 +141,11 @@
   position: absolute;
   bottom: 48px; /* Position above the footer */
   right: 1px; /* Align to the right */
+}
+
+.name {
+  color: #004ff8; /* Choose any color you like */
+  font-weight: bold; /* Optional: Make it bold */
 }
 
 /* Mobile responsiveness */
@@ -193,6 +197,23 @@
 
   .login-box button {
     width: 30%; /* Adjust button size for tablets */
+  }
+  .footer-info {
+    width: 60%;
+  }
+  
+  .footer-left {
+    text-align: left;
+    position: absolute;
+    bottom: 58px; /* Position above the footer */
+    left: 20px; /* Align to the left */
+  }
+  
+  .footer-right {
+    position: absolute;
+    text-align: left;
+    bottom: 40px; /* Position above the footer */
+    left: 20px; /* Align to the right */
   }
 }
 
