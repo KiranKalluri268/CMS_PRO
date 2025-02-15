@@ -13,6 +13,7 @@ import VerifyEmail from './pages/EmailVerification';
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import UpdateUser from "./pages/UpdateUserProfile";
+import SendVerification from "./pages/SendVerification";
 
 // Set the global baseURL for all Axios requests
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -56,6 +57,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/update-user" element={<UpdateUser />} />
+        <Route path="/send-verification" element={<SendVerification />} />
       </Routes>
     </Router>
   );

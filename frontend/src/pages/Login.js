@@ -99,9 +99,15 @@ const Login = () => {
           </button>
           <br />
           <div className="links">
-            <Link to="/forgot-password">Forgot Password?</Link>
-            <br />
-            <Link to="/register">Don't have an account? Register here</Link>
+          {error === "Please verify your email before logging in." ? (
+          <Link to="/send-verification">Resend verification link</Link>
+          ) : (
+            <>
+          <Link to="/forgot-password">Forgot Password?</Link>
+          <br />
+          <Link to="/register">Don't have an account? Register here</Link>
+          </>
+          )}
           </div>
         </form>
       </div>

@@ -1,4 +1,4 @@
-const { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand, ScanCommand  } = require('@aws-sdk/client-dynamodb');
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -323,5 +323,96 @@ exports.updateUser = async (req, res) => {
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).send({ message: "Profile update failed", error });
+  }
+};
+
+exports.requestVerificationLink = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).send({ message: "Email is required" });
+    }
+
+    // Check if user exists
+    const checkEmailParams = {
+      TableName: USERS_TABLE,
+      IndexName: "email-index",
+      KeyConditionExpression: "email = :email",
+      ExpressionAttributeValues: marshall({
+        ":email": email,
+      }),
+    };
+
+    const emailResult = await dynamoDB.send(new QueryCommand(checkEmailParams));
+
+    if (!emailResult.Items || emailResult.Items.length === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const user = unmarshall(emailResult.Items[0]);
+    if (user.isVerified) {
+      return res.status(400).send({ message: "This email is already verified." });
+    }
+
+    // Check if an existing token exists for the user
+    const checkTokenParams = {
+      TableName: VERIFICATION_TOKENS_TABLE,
+      FilterExpression: "userId = :userId",
+      ExpressionAttributeValues: marshall({
+        ":userId": user.userId,
+      }),
+    };
+    const tokenResult = await dynamoDB.send(new ScanCommand(checkTokenParams));
+
+    if (tokenResult.Items && tokenResult.Items.length > 0) {
+      // Mark previous tokens as used
+      for (const item of tokenResult.Items) {
+        const tokenItem = unmarshall(item);
+        if (!tokenItem.isUsed) {
+          const updateTokenParams = {
+            TableName: VERIFICATION_TOKENS_TABLE,
+            Key: marshall({ token: tokenItem.token }),
+            UpdateExpression: "SET isUsed = :isUsed",
+            ExpressionAttributeValues: marshall({
+              ":isUsed": true,
+            }),
+          };
+          await dynamoDB.send(new UpdateItemCommand(updateTokenParams));
+        }
+      }
+    }
+
+    // Generate new verification token
+    const newToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // Valid for 24 hours
+
+    const newVerificationToken = {
+      token: newToken,
+      userId: user.userId,
+      expiresAt: expiresAt.toISOString(),
+      isUsed: false,
+    };
+
+    await addItem(VERIFICATION_TOKENS_TABLE, newVerificationToken);
+
+    // Send new verification email
+    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+    const verificationUrl = `${baseUrl}/verify-email?token=${newToken}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Resend: Verify your email",
+      html: `<p>Hello ${user.name},</p>
+             <p>You requested a new verification link. Click the link below to verify your email:</p>
+             <a href="${verificationUrl}">${verificationUrl}</a>
+             <p>If you didn't request this, please ignore this email.</p>`,
+    });
+
+    res.status(200).send({ message: "A new verification link has been sent to your email." });
+
+  } catch (error) {
+    console.error("Error sending verification link:", error);
+    res.status(500).send({ message: "Failed to resend verification link", error });
   }
 };
