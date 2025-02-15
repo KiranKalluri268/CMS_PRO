@@ -32,14 +32,15 @@ const Login = () => {
           const userRole = decodedToken.userRole; // Extract the role from the token
           const userRollNumber = decodedToken.userRollnumber;
           const userGender = decodedToken.userGender;
+          const userPassout = decodedToken.userPassout;
 
           console.log('Decoded rollNumber:', userRollNumber);
           console.log('Decoded user role:', userRole);
           console.log('Decoded user gender:', userGender);
         
           // Redirect based on userRole
-          if(!userGender){
-            window.location.href = '/update-gender';
+          if(!userGender || !userPassout){
+            window.location.href = '/update-user';
           }else{
           if (userRole === 'student') {
             window.location.href = `/student-home/${decodedToken.userId}`; // Assuming userId is rollNumber

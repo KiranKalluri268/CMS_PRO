@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import '../register.css';
 
-const Register = () => {
+const UpdateForm = () => {
   const [rollNumber, setRollNumber] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [gender, setGender] = useState("");
   const [passoutYear, setPassoutYear] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [passwordRules, setPasswordRules] = useState({
@@ -19,6 +20,37 @@ const Register = () => {
     hasNumber: false,
     hasSpecialChar: false,
   });
+  const navigate = useNavigate();
+  const token = localStorage.getItem('authToken');
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+
+  useEffect(() => {
+      if (!token) {
+        navigate('/');
+      }
+    }, [navigate, token]);
+
+  useEffect(() => {
+    // Fetch user details and pre-fill the form
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('/api/auth/user-details', {
+            headers: { "x-auth-token": token },
+          });
+        const userData = response.data;
+
+        setRollNumber(userData.rollNumber);
+        setName(userData.name);
+        setEmail(userData.email);
+        setGender(userData.gender);
+        setPassoutYear(userData.passoutYear.toString());
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    if (token) fetchUserData();
+}, [token]);
 
   const validatePassword = (password) => {
     setPasswordRules({
@@ -36,25 +68,7 @@ const Register = () => {
     validatePassword(newPassword);
   };
 
-  const handleRollNumberChange = (e) => {
-    const roll = e.target.value;
-    setRollNumber(roll);
-
-    if (/^\d{2}/.test(roll)) {
-      const startYear = 2000 + parseInt(roll.substring(0, 2), 10);
-      const regularPassoutYear = startYear + 4;
-      const lateralPassoutYear = startYear + 3;
-
-      setPassoutYear(regularPassoutYear.toString()); // Set default passout year
-
-      if (passoutYear && ![regularPassoutYear, lateralPassoutYear].includes(parseInt(passoutYear))) {
-        alert("Invalid passout year! Choose a valid year based on your batch.");
-        setPassoutYear("");
-      }
-    }
-  };
-
-  const handlePassoutYearChange = async (e) => {
+  const handlePassoutYearChange = (e) => {
     const selectedYear = parseInt(e.target.value, 10);
     const startYear = 2000 + parseInt(rollNumber.substring(0, 2), 10);
     const regularPassoutYear = startYear + 4;
@@ -68,7 +82,6 @@ const Register = () => {
       setPassoutYear(selectedYear.toString());
       alert("Only select this if you are a lateral entry student.");
       if (!isLateral) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
         alert("You are not a lateral student.");
         setPassoutYear(regularPassoutYear.toString());
       }
@@ -77,33 +90,26 @@ const Register = () => {
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleUpdate = async (event) => {
     event.preventDefault();
     setLoading(true);
 
-    if (email.slice(0, 10).toLowerCase() !== rollNumber.toLowerCase()) {
-      alert('Incorrect email or rollnumber');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await axios.post('/api/auth/register', {
-        rollNumber,
-        email,
-        name,
-        password,
-        gender,
-        passoutYear,
+        const updateData = { name, gender, passoutYear };
+        if (password) updateData.password = password;
+
+      const response = await axios.put('/api/auth/update', updateData, {
+        headers: { "x-auth-token": token },
       });
 
       if (response && response.data) {
-        alert('Registration successful! Please verify your email before logging in.');
-        window.location.href = '/';
+        alert('Profile updated successfully!');
+        localStorage.removeItem("authToken");
+        window.location.href = `/`;
       }
     } catch (error) {
-      console.error('Error during registration:', error);
-      alert(error.response?.data?.message || 'Registration failed');
+      console.error('Error updating profile:', error);
+      alert(error.response?.data?.message || 'Update failed');
     } finally {
       setLoading(false);
     }
@@ -116,19 +122,15 @@ const Register = () => {
       </header>
 
       <div className="register-box">
-        <h1 className="register-title">Register</h1>
-        <form onSubmit={handleSubmit}>
+        <h1 className="register-title">Update Profile</h1>
+        <form onSubmit={handleUpdate}>
           <div className="register-input-group">
             <label htmlFor="rollNo">Roll No:</label>
             <input
               id="rollNo"
               type="text"
-              placeholder="Enter your roll number"
               value={rollNumber}
-              onChange={handleRollNumberChange}
-              required
-              pattern="^[0-3][0-9]{1}[0-9]{3}A[0-9]{2}[A-Z0-9][0-9]$"
-              title="Only uppercase letters are allowed in the roll number (e.g., 22641A05G1)."
+              disabled
             />
           </div>
 
@@ -141,6 +143,16 @@ const Register = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+            />
+          </div>
+
+          <div className="register-input-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              disabled
             />
           </div>
 
@@ -175,52 +187,38 @@ const Register = () => {
             </select>
           </div>
 
-          <div className="register-input-group">
-            <label htmlFor="email">Email:</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              pattern="^[0-3][0-9]{1}[0-9]{3}a[0-9]{2}[a-z0-9][0-9]@vaagdevi.edu.in$"
-              title="Only college mail is allowed (e.g., 22641a05g1@vaagdevi.edu.in)."
-            />
-          </div>
-
+          {/* Password Section */}
           <div className="input-group-password">
             <div className='password-label'>
-            <label htmlFor="password">Password:</label>
+              <label htmlFor="password">New Password (Optional):</label>
             </div>
             <div className="password-input-rules">
-            <div className='password-input'>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={handlePasswordChange}
-              required
-            />
-            </div>
-            <div className="password-rules">
-            <ul>
-              <li className={passwordRules.hasLength ? "valid" : "invalid"}>At least 8 characters</li>
-              <li className={passwordRules.hasUppercase ? "valid" : "invalid"}>At least one uppercase letter</li>
-              <li className={passwordRules.hasLowercase ? "valid" : "invalid"}>At least one lowercase letter</li>
-              <li className={passwordRules.hasNumber ? "valid" : "invalid"}>At least one number</li>
-              <li className={passwordRules.hasSpecialChar ? "valid" : "invalid"}>At least one special character (!@#$%^&*)</li>
-            </ul>
-            </div>
+              <div className='password-input'>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+              </div>
+              <div className="password-rules">
+                <ul>
+                  <li className={passwordRules.hasLength ? "valid" : "invalid"}>At least 8 characters</li>
+                  <li className={passwordRules.hasUppercase ? "valid" : "invalid"}>At least one uppercase letter</li>
+                  <li className={passwordRules.hasLowercase ? "valid" : "invalid"}>At least one lowercase letter</li>
+                  <li className={passwordRules.hasNumber ? "valid" : "invalid"}>At least one number</li>
+                  <li className={passwordRules.hasSpecialChar ? "valid" : "invalid"}>At least one special character (!@#$%^&*)</li>
+                </ul>
+              </div>
             </div>
           </div>
 
           <button type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Register"}
+            {loading ? "Updating..." : "Update"}
           </button>
           <br />
-          <Link to="/">Already have an account? Login here</Link>
+          {/* <Link to={`/student-home/${decodedToken.userId}`}>Back to Home</Link> */}
         </form>
       </div>
 
@@ -231,4 +229,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default UpdateForm;

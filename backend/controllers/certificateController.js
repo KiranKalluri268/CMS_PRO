@@ -183,7 +183,7 @@ exports.uploadCertificate = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    const batchYear = studentDetails.Item.batchYear;
+    const batchYear = studentDetails.Item.passoutYear;
     const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
     await dynamoDB.send(new PutCommand({

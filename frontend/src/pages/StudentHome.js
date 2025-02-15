@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getCertificates } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
@@ -122,7 +123,7 @@ const StudentHome = () => {
 
       <div className="list">
         <div className="nav">
-          <h1 className='Name'>Welcome, {userName}</h1>
+          <h1 className='Name'>Welcome, <Link to="/update-user" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{userName}</Link></h1>
           <button onClick={() => navigate('/add-certificate')}>Add New Certificate</button>
         </div>
         <div className='table-wrapper'>

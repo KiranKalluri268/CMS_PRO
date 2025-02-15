@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 // Register Function
 exports.register = async (req, res) => {
   try {
-    const { name, rollNumber, email, password, gender } = req.body;
+    const { name, rollNumber, email, password, gender, passoutYear } = req.body; // Added passoutYear
 
     // Check if rollNumber already exists
     const checkRollNumberParams = {
@@ -74,7 +74,7 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       role: "student",
-      batchYear: null,
+      passoutYear,  // Added passoutYear field
       isVerified: false,
       CreatedTime: timestamp,
     };
@@ -149,16 +149,15 @@ exports.verifyEmail = async (req, res) => {
     }
 
     const user = unmarshall(userData.Item);
-    const year = "20" + user.rollNumber.substring(0, 2); // Extract batch year
+    const passoutYear = user.passoutYear; // Use passoutYear instead of rollNumber
 
     // Mark user as verified
     const updateUserParams = {
       TableName: USERS_TABLE,
       Key: marshall({ userId }),
-      UpdateExpression: "SET isVerified = :isVerified, batchYear = :batchYear",
+      UpdateExpression: "SET isVerified = :isVerified",
       ExpressionAttributeValues: marshall({
         ":isVerified": true,
-        ":batchYear": year,
       }),
     };
     await dynamoDB.send(new UpdateItemCommand(updateUserParams));
@@ -166,14 +165,14 @@ exports.verifyEmail = async (req, res) => {
     // Check if batch exists
     const batchParams = {
       TableName: BATCHES_TABLE,
-      Key: marshall({ year }),
+      Key: marshall({ year: passoutYear }),
     };
     const batchData = await dynamoDB.send(new GetItemCommand(batchParams));
 
     if (!batchData.Item) {
       // Create new batch if it doesn't exist
       const newBatch = {
-        year,
+        year: passoutYear,
         students: [userId],
       };
       await addItem(BATCHES_TABLE, newBatch);
@@ -181,7 +180,7 @@ exports.verifyEmail = async (req, res) => {
       // Add user to existing batch
       const updateBatchParams = {
         TableName: BATCHES_TABLE,
-        Key: marshall({ year }),
+        Key: marshall({ year: passoutYear }),
         UpdateExpression: "SET students = list_append(if_not_exists(students, :emptyList), :newStudent)",
         ExpressionAttributeValues: marshall({
           ":emptyList": [],
@@ -190,7 +189,6 @@ exports.verifyEmail = async (req, res) => {
       };
       await dynamoDB.send(new UpdateItemCommand(updateBatchParams));
     }
-
 
     // Mark token as used
     const updateTokenParams = {
@@ -248,7 +246,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.userId,userRollnumber: user.rollNumber, userName: user.name, userRole: user.role, userGender: user.gender },
+      { userId: user.userId,userRollnumber: user.rollNumber, userName: user.name, userRole: user.role, userGender: user.gender, userPassout: user.passoutYear },
       "secret_key_of_cms",
       { expiresIn: "1h" }
     );
@@ -260,5 +258,70 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).send({ message: "Login failed due to server error", error });
+  }
+};
+
+// Fetch User Details
+exports.getUserDetails = async (req, res) => {
+  try {
+    const userId = req.studentId; // Extract from JWT token
+
+    const params = {
+      TableName: USERS_TABLE,
+      Key: marshall({ userId }),
+    };
+
+    const result = await dynamoDB.send(new GetItemCommand(params));
+
+    if (!result.Item) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const user = unmarshall(result.Item);
+    delete user.password; // Remove password before sending
+
+    res.status(200).send(user);
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).send({ message: "Error fetching user details", error });
+  }
+};
+
+// Update User Details
+exports.updateUser = async (req, res) => {
+  try {
+    const userId = req.studentId; // Extract from JWT token
+    const { name, gender, passoutYear, password } = req.body;
+    
+    let updateExpression = "SET #name = :name, gender = :gender, passoutYear = :passoutYear";
+    let expressionValues = {
+      ":name": name,
+      ":gender": gender,
+        ":passoutYear": passoutYear,
+    };
+    let expressionNames = {
+      "#name": "name",
+    };
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateExpression += ", password = :password";
+      expressionValues[":password"] = hashedPassword;
+    }
+
+    const params = {
+      TableName: USERS_TABLE,
+      Key: marshall({ userId }),
+      UpdateExpression: updateExpression,
+      ExpressionAttributeValues: marshall(expressionValues),
+      ExpressionAttributeNames: expressionNames, // ADD THIS LINE
+    };
+    
+    await dynamoDB.send(new UpdateItemCommand(params));    
+
+    res.status(200).send({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).send({ message: "Profile update failed", error });
   }
 };
