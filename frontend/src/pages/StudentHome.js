@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState} from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getCertificates } from '../api';
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
 import '../studenthome.css';
 
 const StudentHome = () => {
@@ -12,11 +10,10 @@ const StudentHome = () => {
   const [loading, setLoading] = useState(false);
   const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
   const token = localStorage.getItem('authToken');
-  console.log("token in studenthome:", token);
 
   useEffect(() => {
     if (!token) {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate, token]);
 
@@ -47,7 +44,9 @@ const StudentHome = () => {
     }
   };
   useEffect(() => {
-    fetchCertificates();
+    if (token) {
+      fetchCertificates();
+    }
   }, [studentId, token, navigate]);
 
   const handleLoadMore = () => {
@@ -100,7 +99,14 @@ const StudentHome = () => {
     }
   };
 
-  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  let decodedToken;
+  try {
+    decodedToken = JSON.parse(atob(token.split('.')[1]));
+  } catch (error) {
+    console.error("Invalid token format:", error);
+    navigate('/');
+    return null;
+  }
   const userName = decodedToken.userName;
 
   const handleLogout = () => {

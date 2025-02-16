@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import '../login.css';
@@ -8,6 +10,29 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const token = localStorage.getItem('authToken');
+
+    useEffect(() => {
+      if (token) {
+
+      try {
+          const decodedToken = JSON.parse(atob(token.split(".")[1]));
+          const userRole = decodedToken.userRole;
+          const userId = decodedToken.userId;
+
+          if (userRole === "student") {
+              navigate(`/student-home/${userId}`);
+          } else if (userRole === "admin") {
+              navigate("/admin-home");
+          } else {
+              console.error("Unknown role.");
+          }
+      } catch (error) {
+          console.error("Invalid token format", error);
+      }
+    }
+  }, [navigate, token]);
   
     const handleSubmit = async (event) => {
       event.preventDefault();
@@ -29,14 +54,9 @@ const Login = () => {
           // Decode the token to extract userRole
           const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decoding the JWT
           console.log("Decoded in frontend login:",decodedToken);
-          const userRole = decodedToken.userRole; // Extract the role from the token
-          const userRollNumber = decodedToken.userRollnumber;
+          const userRole = decodedToken.userRole;
           const userGender = decodedToken.userGender;
           const userPassout = decodedToken.userPassout;
-
-          console.log('Decoded rollNumber:', userRollNumber);
-          console.log('Decoded user role:', userRole);
-          console.log('Decoded user gender:', userGender);
         
           // Redirect based on userRole
           if(!userGender || !userPassout){
@@ -47,7 +67,7 @@ const Login = () => {
           } else if (userRole === 'admin') {
             window.location.href = '/admin-home'; // Admin doesn't need rollNumber in URL
           } else {
-            console.error('Unknown role. Cannot navigate.');
+            console.error('Unknown role.');
           }
         }
         } else {

@@ -22,7 +22,6 @@ const UpdateForm = () => {
   });
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
-  const decodedToken = JSON.parse(atob(token.split('.')[1]));
 
   useEffect(() => {
       if (!token) {
@@ -51,6 +50,15 @@ const UpdateForm = () => {
 
     if (token) fetchUserData();
 }, [token]);
+
+let decodedToken;
+      try {
+        decodedToken = JSON.parse(atob(token.split('.')[1]));
+      } catch (error) {
+        console.error("Invalid token format:", error);
+        navigate('/');
+        return null;
+      }
 
   const validatePassword = (password) => {
     setPasswordRules({

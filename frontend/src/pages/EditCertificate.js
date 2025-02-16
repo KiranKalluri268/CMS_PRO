@@ -17,7 +17,6 @@ const EditCertificate = () => {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken');
-  const decodedToken = JSON.parse(atob(token.split('.')[1]));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -40,6 +39,15 @@ const EditCertificate = () => {
 
     if (id) fetchCertificate();
   }, [id]);
+
+  let decodedToken;
+    try {
+      decodedToken = JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      console.error("Invalid token format:", error);
+      navigate('/');
+      return null;
+    }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,8 +80,6 @@ const EditCertificate = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      const token = localStorage.getItem("authToken");
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const studentId = decodedToken.studentId;
       alert('Certificate updated successfully');
       window.location.href = `/student-home/${studentId}`;
@@ -100,8 +106,6 @@ const EditCertificate = () => {
         headers: { "x-auth-token": localStorage.getItem("authToken") },
       });
       alert('Certificate deleted successfully');
-      const token = localStorage.getItem("authToken");
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
       const studentId = decodedToken.userId;
   
       window.location.href = `/student-home/${studentId}`;

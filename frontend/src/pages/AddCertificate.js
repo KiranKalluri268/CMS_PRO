@@ -8,18 +8,26 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   const [formData, setFormData] = useState({ organisation: '', course: '', fromDate: '', toDate: '', certificateLink: '' });
   const [pdf, setPdf] = useState(null);
   const token = localStorage.getItem('authToken');
-  const decodedToken = JSON.parse(atob(token.split('.')[1]));
   const [loading, setLoading] = useState(false);
   const [organisation, setOrganisation] = useState("");
   const [customOrganisation, setCustomOrganisation] = useState("");
-
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
     if (!token) {
       navigate('/');
     }
   }, [navigate]);
+
+  let decodedToken;
+      try {
+        decodedToken = JSON.parse(atob(token.split('.')[1]));
+      } catch (error) {
+        console.error("Invalid token format:", error);
+        navigate('/');
+        return null;
+      }
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
   const handleFileChange = (e) => setPdf(e.target.files[0]);
@@ -69,8 +77,6 @@ const AddCertificate = ({ rollNumber: studentId }) => {
     }
   
     try {
-      const token = localStorage.getItem("authToken");
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
       const studentId = decodedToken.userId;
   
       // Call the API to upload the certificate
