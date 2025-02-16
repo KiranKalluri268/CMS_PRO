@@ -1,10 +1,9 @@
-/* Center the entire container on the page */
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh; /* Full viewport height to center the box */
+  height: 100vh;
   background-color: #f7f1f169;
   margin: 0;
 }
@@ -21,13 +20,12 @@
 }
 
 .LoginHeader-logo {
-  width:auto;
+  width: auto;
   height: 100%;
   max-height: 100px;
   object-fit: contain;
 }
 
-/* Login form box */
 .login-box {
   background-color: #dfdddd00;
   backdrop-filter: blur(5px);
@@ -45,7 +43,6 @@
   color: #970f0f;
 }
 
-/* Form elements */
 .input-group {
   margin-bottom: 12px;
   display: flex;
@@ -53,7 +50,6 @@
   justify-content: space-between;
 }
 
-/* Label styling */
 .input-group label {
   display: inline-block;
   width: 80px;
@@ -63,7 +59,6 @@
   text-align: right;
 }
 
-/* Input fields */
 .input-group input,
 .input-group select {
   flex-grow: 1;
@@ -75,7 +70,6 @@
   box-sizing: border-box;
 }
 
-/* Login button */
 .login-box button {
   width: 30%;
   padding: 10px;
@@ -90,19 +84,16 @@
   margin-bottom: 10px;
 }
 
-/* Hover effect on button */
 .login-box button:hover {
   background-color: #970f0f;
 }
 
-/* Heading styling */
 .login-box h1 {
   font-size: 24px;
   margin-top: 0px;
   margin-bottom: 30px;
 }
 
-/* Footer styling */
 .footer {
   width: 100%;
   background-color: #333;
@@ -133,28 +124,27 @@
 .footer-left {
   text-align: left;
   position: absolute;
-  bottom: 50px; /* Position above the footer */
-  left: 20px; /* Align to the left */
+  bottom: 50px;
+  left: 20px;
 }
 
 .footer-right {
   position: absolute;
-  bottom: 48px; /* Position above the footer */
-  right: 1px; /* Align to the right */
+  bottom: 48px;
+  right: 1px;
 }
 
 .name {
-  color: #004ff8; /* Choose any color you like */
-  font-weight: bold; /* Optional: Make it bold */
+  color: #004ff8;
+  font-weight: bold;
 }
 
-/* Mobile responsiveness */
 @media (max-width: 768px) {
   .LoginHeader-logo {
-    max-width: 300px; /* Reduce size for smaller screens */
+    max-width: 300px;
   }
 
-  .login-box { /* Reduce the width for smaller screens */
+  .login-box {
     padding: 15px;
   }
 
@@ -163,7 +153,7 @@
   }
 
   .login-box button {
-    width: 30%; /* Adjust button width for smaller screens */
+    width: 30%;
   }
 
   .footer-info {
@@ -173,22 +163,21 @@
   .footer-left {
     text-align: left;
     position: absolute;
-    bottom: 58px; /* Position above the footer */
-    left: 20px; /* Align to the left */
+    bottom: 58px;
+    left: 20px;
   }
   
   .footer-right {
     position: absolute;
     text-align: left;
-    bottom: 40px; /* Position above the footer */
-    left: 20px; /* Align to the right */
+    bottom: 40px;
+    left: 20px;
   }
 }
 
-/* Tablet responsiveness */
 @media (min-width: 768px) and (max-width: 1024px) {
   .login-box {
-    width: 30%; /* Allow more space on tablets */
+    width: 30%;
   }
 
   .login-box h1 {
@@ -196,8 +185,9 @@
   }
 
   .login-box button {
-    width: 30%; /* Adjust button size for tablets */
+    width: 30%;
   }
+
   .footer-info {
     width: 60%;
   }
@@ -205,15 +195,15 @@
   .footer-left {
     text-align: left;
     position: absolute;
-    bottom: 58px; /* Position above the footer */
-    left: 20px; /* Align to the left */
+    bottom: 58px;
+    left: 20px;
   }
   
   .footer-right {
     position: absolute;
     text-align: left;
-    bottom: 40px; /* Position above the footer */
-    left: 20px; /* Align to the right */
+    bottom: 40px;
+    left: 20px;
   }
 }
 

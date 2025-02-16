@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import * as XLSX from "xlsx"; // Import XLSX library
+import * as XLSX from "xlsx";
 import "../adminreport.css";
 
 const AdminReport = () => {
-  const { batchYear } = useParams(); // Get batchYear from URL params
+  const { batchYear } = useParams();
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
-  const [academicYear, setAcademicYear] = useState(""); // State for filtering by academic year
-  const [years, setYears] = useState([]); // State for storing available academic years
+  const [academicYear, setAcademicYear] = useState("");
+  const [years, setYears] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
@@ -28,7 +28,7 @@ const AdminReport = () => {
     console.log("Fetching certificates...");
     console.log("Current lastEvaluatedKey:", lastEvaluatedKey);
   
-    if (isFetching) return; // Prevent multiple concurrent calls
+    if (isFetching) return;
       isFetching = true;
       setLoading(true);
       let nextKey = lastEvaluatedKey;
@@ -38,7 +38,7 @@ const AdminReport = () => {
       const response = await axios.get(`/api/admin/certificates`, {
         params: {
           year: batchYear,
-          lastEvaluatedKey: nextKey ? JSON.stringify(nextKey) : undefined, // Encode correctly
+          lastEvaluatedKey: nextKey ? JSON.stringify(nextKey) : undefined,
         },
         headers: { "x-auth-token": localStorage.getItem("authToken") },
       });
@@ -49,21 +49,18 @@ const AdminReport = () => {
       const newCertificates = response.data.certificates || [];  
       if (newCertificates.length === 0 && !response.data.lastEvaluatedKey) {
         console.log("No more certificates to fetch.");
-        setLastEvaluatedKey(null); // Ensure no further requests
+        setLastEvaluatedKey(null);
         break;
       }
-  
-      // Append new certificates to the existing list
+
       setCertificates((prevCertificates) => [...prevCertificates, ...newCertificates]);
       setFilteredCertificates((prevFiltered) => [...prevFiltered, ...newCertificates]);
   
       console.log("Total certificates loaded:", newCertificates.length);
-  
-      // Extract unique academic years
+
       const uniqueYears = [...new Set([...years, ...newCertificates.map(c => getAcademicYear(c.toDate))])];
       setYears(uniqueYears);
-  
-      // Set lastEvaluatedKey for next request
+
       nextKey = response.data.lastEvaluatedKey || null;
       setLastEvaluatedKey(nextKey);
     } while (nextKey);
@@ -80,8 +77,7 @@ const AdminReport = () => {
       isFetching = false;
     }
   };
-  
-  // Run only on page load
+
   fetchCertificates();
   }, [batchYear, navigate]);
   
@@ -92,7 +88,7 @@ const AdminReport = () => {
   
     if (selectedYear) {
       const filtered = certificates.filter(certificate => {
-        const academicYear = getAcademicYear(certificate.toDate); // Use the same function for consistency
+        const academicYear = getAcademicYear(certificate.toDate);
         return academicYear === selectedYear;
       });
       setFilteredCertificates(filtered);
@@ -136,7 +132,7 @@ const AdminReport = () => {
   const getAcademicYear = (date) => {
     const toDate = new Date(date);
     const year = toDate.getFullYear();
-    const month = toDate.getMonth() + 1; // JavaScript months are 0-based
+    const month = toDate.getMonth() + 1;
   
     return month >= 6 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
   };
@@ -148,25 +144,21 @@ const AdminReport = () => {
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
     let days = end.getDate() - start.getDate();
-  
-    // Adjust for negative days
+
     if (days < 0) {
       months -= 1;
-      let prevMonth = new Date(end.getFullYear(), end.getMonth(), 0); // Last day of the previous month
+      let prevMonth = new Date(end.getFullYear(), end.getMonth(), 0);
       days += prevMonth.getDate();
     }
-  
-    // Adjust for negative months
+
     if (months < 0) {
       years -= 1;
       months += 12;
     }
-  
-    // Convert remaining days to weeks
+
     let weeks = Math.floor(days / 7);
-    days = days % 7; // Remaining days after weeks are counted
-  
-    // Construct the result string
+    days = days % 7;
+
     let durationStr = [];
     if (years > 0) durationStr.push(`${years} year${years > 1 ? "s" : ""}`);
     if (months > 0) durationStr.push(`${months} month${months > 1 ? "s" : ""}`);

@@ -14,7 +14,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     if (!token) {
       navigate('/');
     }
@@ -50,7 +50,6 @@ const AddCertificate = ({ rollNumber: studentId }) => {
     const organisationToSend =
       organisation === "Other" ? customOrganisation : organisation;
 
-    // Validate date range
     const fromDate = new Date(formData.fromDate);
     const toDate = new Date(formData.toDate);
 
@@ -60,7 +59,6 @@ const AddCertificate = ({ rollNumber: studentId }) => {
       return;
     }
   
-    // Prepare form data
     const data = new FormData();
     data.append("rollNumber", studentId);
     data.append("organisation", organisationToSend);
@@ -68,7 +66,6 @@ const AddCertificate = ({ rollNumber: studentId }) => {
     data.append("fromDate", formData.fromDate);
     data.append("toDate", formData.toDate);
   
-    // Handle certificate link or PDF upload
     if (formData.certificateLink) {
       data.append("certificateLink", formData.certificateLink);
     }
@@ -78,12 +75,10 @@ const AddCertificate = ({ rollNumber: studentId }) => {
   
     try {
       const studentId = decodedToken.userId;
-  
-      // Call the API to upload the certificate
+
       await uploadCertificate(data, token);
       alert("Certificate uploaded successfully");
-  
-      // Redirect to student home
+
       window.location.href = `/student-home/${studentId}`;
     } catch (error) {
       if (error.response && error.response.status === 401) {

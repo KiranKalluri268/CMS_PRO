@@ -12,7 +12,7 @@ const EditCertificate = () => {
     fromDate: '',
     toDate: '',
     pdf: '',
-    certificateLink: '',  // New field for certificate link
+    certificateLink: '',
   });
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
@@ -20,14 +20,13 @@ const EditCertificate = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     if (!token) {
       navigate('/');
     }
   }, [navigate]);
 
   useEffect(() => {
-    // Fetch the certificate details by ID
     const fetchCertificate = async () => {
       try {
         const response = await axios.get(`/api/certificates/certificates/${id}`);
@@ -69,7 +68,7 @@ const EditCertificate = () => {
     formData.append('course', certificate.course);
     formData.append('fromDate', certificate.fromDate);
     formData.append('toDate', certificate.toDate);
-    formData.append('certificateLink', certificate.certificateLink); // Add certificateLink to form data
+    formData.append('certificateLink', certificate.certificateLink);
     if (file) {
       formData.append('pdf', file);
     }
@@ -85,10 +84,9 @@ const EditCertificate = () => {
       window.location.href = `/student-home/${studentId}`;
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        // Token expired or authentication error
         alert("Session expired. Please log in again.");
-        localStorage.removeItem("authToken"); // Clear the token
-        navigate("/"); // Redirect to login page
+        localStorage.removeItem("authToken");
+        navigate("/");
       } else {
       console.error('Error updating certificate:', error);
       }
@@ -118,7 +116,6 @@ const EditCertificate = () => {
 
   return (
     <div className="edit-form-container">
-      {/* Header Section */}
       <header className="EditHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="EditHeader-logo" />
       </header>
@@ -202,7 +199,6 @@ const EditCertificate = () => {
       </form>
     </div>
 
-    {/* Footer Section */}
     <footer className="footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>

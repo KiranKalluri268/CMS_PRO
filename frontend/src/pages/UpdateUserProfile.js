@@ -30,7 +30,6 @@ const UpdateForm = () => {
     }, [navigate, token]);
 
   useEffect(() => {
-    // Fetch user details and pre-fill the form
     const fetchUserData = async () => {
       try {
         const response = await axios.get('/api/auth/user-details', {
@@ -195,7 +194,6 @@ let decodedToken;
             </select>
           </div>
 
-          {/* Password Section */}
           <div className="input-group-password">
             <div className='password-label'>
               <label htmlFor="password">New Password (Optional):</label>

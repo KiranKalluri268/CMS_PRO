@@ -1,26 +1,23 @@
-/* Center the content and add padding to allow scrolling */
-
 .Student-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Ensure content stays at top */
+  justify-content: flex-start;
   background-color: #f7f6f641;
   margin: 0;
   margin-top: 0px;
-  padding-top: 0px; /* Ensure space for header */
-  overflow-y: auto; /* Allow vertical scrolling */
-  height: calc(100vh); /* Ensure the container takes the full height, minus header */
+  padding-top: 0px;
+  overflow-y: auto;
+  height: calc(100vh);
 }
 
-/* Header styling */
 .StudentHeader {
   background-color: #dfdddd65;
   backdrop-filter: blur(5px);
   padding: 20px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
-  position: sticky; /* Fix the header at the top and make it scroll with content */
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
@@ -28,11 +25,12 @@
 }
 
 .StudentHeader-logo {
-  width:auto;
+  width: auto;
   height: 100%;
   max-height: 100px;
   object-fit: contain;
 }
+
 .StudentLogout-logo {
   width: auto;
   height: 100%;
@@ -41,15 +39,14 @@
   position: absolute;
   right: 0px;
   bottom: 25px;
-  opacity: 0.7; /* Initial opacity */
-  transition: opacity 0.3s ease; /* Smooth transition effect */
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
 }
 
 .StudentLogout-logo:hover {
-  opacity: 1; /* Full opacity on hover */
+  opacity: 1;
 }
 
-/* Styling for the table container */
 .list {
   background-color: #dfdddd00;
   backdrop-filter: blur(5px);
@@ -59,29 +56,28 @@
   width: 95%;
   display: flex;
   flex-direction: column;
-  margin-top: 30px; /* Ensure there's spacing between the header and the list */
+  margin-top: 30px;
   margin-bottom: 30px;
-  overflow-x: auto; /* Allow horizontal scrolling */
-  max-height: 645px; /* Ensure table content is scrollable without overlapping footer */
-  overflow-y: auto; /* Allow vertical scrolling for table content */
+  overflow-x: auto;
+  max-height: 645px;
+  overflow-y: auto;
 }
 
 .Name {
   color: #970f0f;
 }
 
-/* Table styling */
 table {
-  width: 100%; /* Take full width of container */
+  width: 100%;
   border-collapse: collapse;
-  table-layout: auto; /* Allow table cells to adjust based on content */
+  table-layout: auto;
 }
 
 th, td {
   padding: 10px;
   text-align: left;
   border: 1px solid #ddd;
-  white-space: nowrap; /* Allow text to wrap */
+  white-space: nowrap;
 }
 
 th {
@@ -113,7 +109,6 @@ button:hover {
   background-color: #970f0f;
 }
 
-/* Footer styling */
 .Studenthome-footer {
   width: 100%;
   background-color: #333;
@@ -131,7 +126,6 @@ button:hover {
   font-size: 14px;
 }
 
-/* Responsive design for mobile */
 @media (max-width: 768px) {
   .StudentHeader-logo {
     max-width: 300px;

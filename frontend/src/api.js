@@ -1,13 +1,10 @@
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
-
-// Axios instance to set default headers
 const API = axios.create({
   baseURL: API_URL,
 });
 
-// Function to set Authorization header
 export const setAuthToken = (token) => {
   if (token) {
     API.defaults.headers.common["x-auth-token"] = token;
@@ -16,17 +13,14 @@ export const setAuthToken = (token) => {
   }
 };
 
-// Register a new user (student)
 export const registerUser = (userData) => {
   return API.post("/api/auth/register", userData);
 };
 
-// Login user (student)
 export const loginUser = (userData) => {
   return API.post("/api/auth/login", userData);
 };
 
-// Upload a certificate with authentication
 export const uploadCertificate = (data, token) => {
   return API.post("/api/certificates/upload", data, {
     headers: {
@@ -36,7 +30,6 @@ export const uploadCertificate = (data, token) => {
   });
 };
 
-// Fetch certificates for a specific student using their roll number (Authenticated)
 export const getCertificates = (studentId, token, lastEvaluatedKey) => {
   return API.get(`/api/certificates/student/${studentId}`, {
     params: {
@@ -48,7 +41,6 @@ export const getCertificates = (studentId, token, lastEvaluatedKey) => {
   });
 };
 
-// Fetch all certificates (Admin only)
 export const fetchAllCertificates = (token) => {
   return API.get('/api/certificates', {
     headers: {
@@ -57,12 +49,10 @@ export const fetchAllCertificates = (token) => {
   });
 };
 
-// Fetch list of batches
 export const fetchBatches = () => {
   return API.get('/api/batches');
 };
 
-// Fetch students by batch (Admin)
 export const fetchStudentsByBatch = (batchId, token) => {
   return API.get(`/api/students/batch/${batchId}`, {
     headers: {
@@ -71,7 +61,6 @@ export const fetchStudentsByBatch = (batchId, token) => {
   });
 };
 
-// Fetch certificates by academic year for filtering (Admin)
 export const fetchCertificatesByYear = (year, token) => {
   return API.get(`/api/certificates/year/${year}`, {
     headers: {

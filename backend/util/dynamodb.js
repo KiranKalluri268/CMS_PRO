@@ -2,7 +2,6 @@ const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const {
   DynamoDBDocumentClient,
   PutCommand,
-  GetCommand,
   DeleteCommand,
   UpdateCommand,
 } = require("@aws-sdk/lib-dynamodb");
@@ -10,7 +9,6 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-// Initialize DynamoDB Client with credentials and region from environment variables
 const dynamoDBClient = new DynamoDBClient({
   region: process.env.AWS_REGION,
   credentials: {
@@ -19,10 +17,8 @@ const dynamoDBClient = new DynamoDBClient({
   },
 });
 
-// Create the DynamoDB Document Client from the base DynamoDB client
 const dynamoDB = DynamoDBDocumentClient.from(dynamoDBClient);
 
-// Function to add an item
 const addItem = async (tableName, item) => {
   const params = {
     TableName: tableName,
@@ -38,7 +34,6 @@ const addItem = async (tableName, item) => {
   }
 };
 
-// Function to delete an item
 const deleteItem = async (tableName, key) => {
   try {
     const command = new DeleteCommand({
@@ -53,7 +48,6 @@ const deleteItem = async (tableName, key) => {
   }
 };
 
-// Function to update a DynamoDB item
 const updateItem = async (params) => {
   try {
     const command = new UpdateCommand(params);

@@ -45,7 +45,7 @@ const Register = () => {
       const regularPassoutYear = startYear + 4;
       const lateralPassoutYear = startYear + 3;
 
-      setPassoutYear(regularPassoutYear.toString()); // Set default passout year
+      setPassoutYear(regularPassoutYear.toString());
 
       if (passoutYear && ![regularPassoutYear, lateralPassoutYear].includes(parseInt(passoutYear))) {
         alert("Invalid passout year! Choose a valid year based on your batch.");

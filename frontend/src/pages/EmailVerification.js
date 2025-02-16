@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../emailverification.css";
 
 const VerifyEmail = () => {
   const [message, setMessage] = useState("");
-  const [gifUrl, setGifUrl] = useState(""); // State to store the GIF URL
-  const [isVerified, setIsVerified] = useState(false); // Track successful verification
+  const [gifUrl, setGifUrl] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate(); // Hook to navigate to login page
+  const navigate = useNavigate();
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -18,18 +18,17 @@ const VerifyEmail = () => {
         const response = await axios.get(`/api/auth/verify-email?token=${token}`);
 
         setMessage(response.data.message);
-        setGifUrl("/images/verifed.gif"); // Set success GIF URL
-        setIsVerified(true); // Mark verification as successful
+        setGifUrl("/images/verifed.gif");
+        setIsVerified(true);
       } catch (error) {
         const errorMessage = error.response?.data?.message || "Verification failed.";
         setMessage(errorMessage);
 
-        // Check the error message to display the appropriate GIF
         if (errorMessage === "This email has already been verified.") {
           setGifUrl("/images/verifed.gif");
-          setIsVerified(true); // Already verified, allow login
+          setIsVerified(true);
         } else {
-          setGifUrl("/images/expired.gif"); // Failure GIF URL
+          setGifUrl("/images/expired.gif");
         }
       }
     };
@@ -45,7 +44,6 @@ const VerifyEmail = () => {
       </div>
       <p className="zoom-animation">{message}</p>
 
-      {/* Show login button only if verification is successful */}
       {isVerified && (
         <button className="zoom-animation" onClick={() => navigate("/")}>
           Go to Login

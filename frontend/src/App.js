@@ -15,7 +15,6 @@ import ResetPassword from "./pages/ResetPassword";
 import UpdateUser from "./pages/UpdateUserProfile";
 import SendVerification from "./pages/SendVerification";
 
-// Set the global baseURL for all Axios requests
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
   useEffect(() => {
     const checkWebsiteStatus = async () => {
       try {
-        const response = await axios.get('/'); // Ensure this endpoint is accessible
+        const response = await axios.get('/');
         if (response.status === 200) {
           setIsLoading(false);
         }
@@ -40,7 +39,7 @@ function App() {
   
 
   if (isLoading) {
-    return <div className="loading-screen">Loading...</div>; // Customize loading screen as needed
+    return <div className="loading-screen">Loading...</div>;
   }
 
   return (

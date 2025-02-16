@@ -44,28 +44,24 @@ const Login = () => {
           rollNumber,
           password,
         });
-    
-        // Check if `response` and `response.data` exist
+
         if (response && response.data) {
-          // Store the token in localStorage
           const token = response.data.token;
           localStorage.setItem('authToken', token);
-        
-          // Decode the token to extract userRole
-          const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decoding the JWT
+
+          const decodedToken = JSON.parse(atob(token.split('.')[1]));
           console.log("Decoded in frontend login:",decodedToken);
           const userRole = decodedToken.userRole;
           const userGender = decodedToken.userGender;
           const userPassout = decodedToken.userPassout;
-        
-          // Redirect based on userRole
+
           if(!userGender || !userPassout){
             window.location.href = '/update-user';
           }else{
           if (userRole === 'student') {
-            window.location.href = `/student-home/${decodedToken.userId}`; // Assuming userId is rollNumber
+            window.location.href = `/student-home/${decodedToken.userId}`;
           } else if (userRole === 'admin') {
-            window.location.href = '/admin-home'; // Admin doesn't need rollNumber in URL
+            window.location.href = '/admin-home';
           } else {
             console.error('Unknown role.');
           }

@@ -1,7 +1,6 @@
 const cloudinary = require('cloudinary').v2;
 const {
   uploadFile,
-  getResource,
   deleteResource,
 } = require("../util/cloudinary");
 const {
@@ -18,7 +17,6 @@ const dynamoDB = new DynamoDBClient({ region: process.env.AWS_REGION });
 const USERS_TABLE = process.env.USERS_TABLE || "Users";
 const CERTIFICATES_TABLE = process.env.CERTIFICATES_TABLE || "Certificates";
 
-// Update a certificate
 exports.updateCertificate = async (req, res) => {
   try {
     const { id } = req.params;
@@ -78,7 +76,6 @@ exports.updateCertificate = async (req, res) => {
       expressionAttributeNames['#downloadLink'] = 'downloadLink';
     }
 
-    // Always update LastUpdatedTime in IST
     const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
     updateFields.push('#LastUpdatedTime = :LastUpdatedTime');
     updateValues[':LastUpdatedTime'] = timestamp;
@@ -110,10 +107,9 @@ exports.updateCertificate = async (req, res) => {
   }
 };
 
-// Fetch certificates for a specific student
 exports.getCertificatesByStudent = async (req, res) => {
   const studentId = req.studentId;
-  const { lastEvaluatedKey } = req.query; // Retrieve pagination key from request
+  const { lastEvaluatedKey } = req.query;
 
   try {
     const params = {
@@ -123,7 +119,7 @@ exports.getCertificatesByStudent = async (req, res) => {
       ExpressionAttributeValues: marshall({
         ":studentId": studentId,
       }),
-      Limit: 10, // Limit number of certificates per request
+      Limit: 10,
     };
 
     if (lastEvaluatedKey) {
@@ -144,7 +140,6 @@ exports.getCertificatesByStudent = async (req, res) => {
   }
 };
 
-// Controller to upload a certificate
 exports.uploadCertificate = async (req, res) => {
   try {
     const { organisation, course, fromDate, toDate, certificateLink } = req.body;
@@ -196,8 +191,8 @@ exports.uploadCertificate = async (req, res) => {
         fromDate,
         toDate,
         batchYear,
-        CreatedTime: timestamp,       // Set CreatedTime
-        LastUpdatedTime: timestamp,   // Initially same as CreatedTime
+        CreatedTime: timestamp,
+        LastUpdatedTime: timestamp,
         ...(downloadLink ? { downloadLink } : {}),
         ...(certificateLink ? { certificateLink } : {}),
       },
@@ -210,8 +205,6 @@ exports.uploadCertificate = async (req, res) => {
   }
 };
 
-
-// Controller to get a certificate by ID
 exports.getCertificateById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -237,12 +230,10 @@ exports.getCertificateById = async (req, res) => {
   }
 };
 
-// Controller to delete a certificate
 exports.deleteCertificate = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Fetch the existing certificate from the Certificates table
     const certificateResponse = await dynamoDB.send(
       new GetCommand({
         TableName: process.env.CERTIFICATES_TABLE,
@@ -257,13 +248,11 @@ exports.deleteCertificate = async (req, res) => {
     }
     console.log("deleting certificate:",certificate);
 
-    // Delete the certificate PDF from Cloudinary if it exists
     if (certificate.certificateId) {
       console.log("Deleting certificate PDF from Cloudinary:", certificate.certificateId);
       await deleteResource(certificate.certificateId);
     }
 
-    // Delete the certificate entry from the Certificates table
     await dynamoDB.send(
       new DeleteCommand({
         TableName: process.env.CERTIFICATES_TABLE,
@@ -271,16 +260,13 @@ exports.deleteCertificate = async (req, res) => {
       })
     );
 
-    // Calculate the academic years using the fromDate and toDate
     const fromDate = new Date(certificate.fromDate);
     const toDate = new Date(certificate.toDate);
     const academicYears = getAcademicYears(fromDate, toDate);
 
-    // Remove the certificate ID from the Years table for all relevant years
     for (const year of academicYears) {
-      const yearKey = { year }; // Assuming the key in the Years table is 'year'
+      const yearKey = { year };
 
-      // Fetch the current item from the Years table
       const yearItemResponse = await dynamoDB.send(
         new GetCommand({
           TableName: process.env.YEARS_TABLE,
@@ -291,12 +277,10 @@ exports.deleteCertificate = async (req, res) => {
       const yearItem = yearItemResponse.Item;
 
       if (yearItem && yearItem.certificates) {
-        // Remove the certificate ID from the list
         const updatedCertificates = yearItem.certificates.filter(
           (certId) => certId !== id
         );
 
-        // Update the Years table with the new list
         await dynamoDB.send(
           new UpdateCommand({
             TableName: process.env.YEARS_TABLE,
@@ -317,7 +301,6 @@ exports.deleteCertificate = async (req, res) => {
   }
 };
 
-// Utility function to calculate academic years
 const getAcademicYears = (start, end) => {
   const years = [];
   let currentYearStart = new Date(start.getFullYear(), 5, 1);

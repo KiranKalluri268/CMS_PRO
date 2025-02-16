@@ -18,7 +18,7 @@ const StudentHome = () => {
   }, [navigate, token]);
 
   const fetchCertificates = async () => {
-    if (loading) return; // Prevent multiple requests at the same time
+    if (loading) return;
 
     setLoading(true);
     try {
@@ -60,19 +60,16 @@ const StudentHome = () => {
       alert("No download link available.");
       return;
     }
-  
-    // Ensure the filename ends with .pdf
+
     const fileNameWithExtension = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
   
     try {
-      // Fetch the file as a blob
       const response = await fetch(downloadLink);
       if (!response.ok) {
         throw new Error('Failed to fetch the file.');
       }
       const blob = await response.blob();
-  
-      // Create a download link with the blob
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -81,8 +78,7 @@ const StudentHome = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  
-      // Revoke the object URL
+
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading file:', error);
@@ -116,7 +112,6 @@ const StudentHome = () => {
 
   return (
     <div className="Student-container">
-      {/* Header Section */}
       <header className="StudentHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="StudentHeader-logo" />
         <img
@@ -197,7 +192,6 @@ const StudentHome = () => {
         )}
       </div>
 
-      {/* Footer Section */}
       <footer className="Studenthome-footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>

@@ -1,15 +1,12 @@
-const { DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, QueryCommand, ScanCommand  } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient, GetItemCommand, UpdateItemCommand, QueryCommand, ScanCommand  } = require('@aws-sdk/client-dynamodb');
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const { v4: uuidv4 } = require("uuid");
-const { addItem } = require("../util/dynamodb");  // Import the addItem function
+const { addItem } = require("../util/dynamodb");
 const dynamoDB = require("../util/dynamodb").dynamoDB;
-
-//console.log("access key",process.env.AWS_ACCESS_KEY_ID);
-//console.log("secret key",process.env.AWS_SECRET_ACCESS_KEY);
 
 const USERS_TABLE = process.env.USERS_TABLE || "Users";
 const BATCHES_TABLE = process.env.BATCHES_TABLE || "Batches";
@@ -25,15 +22,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Register Function
 exports.register = async (req, res) => {
   try {
-    const { name, rollNumber, email, password, gender, passoutYear } = req.body; // Added passoutYear
+    const { name, rollNumber, email, password, gender, passoutYear } = req.body;
 
-    // Check if rollNumber already exists
     const checkRollNumberParams = {
       TableName: USERS_TABLE,
-      IndexName: 'rollNumberIndex', // GSI for rollNumber
+      IndexName: 'rollNumberIndex',
       KeyConditionExpression: 'rollNumber = :rollNumber',
       ExpressionAttributeValues: {
         ':rollNumber': { S: rollNumber },
@@ -45,10 +40,9 @@ exports.register = async (req, res) => {
       return res.status(400).send({ message: 'Roll number already exists.' });
     }
 
-    // Check if email already exists
     const checkEmailParams = {
       TableName: USERS_TABLE,
-      IndexName: 'email-index', // GSI for email
+      IndexName: 'email-index',
       KeyConditionExpression: 'email = :email',
       ExpressionAttributeValues: {
         ':email': { S: email },
@@ -62,7 +56,6 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the new user
     const userId = uuidv4();
     const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
@@ -74,13 +67,12 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       role: "student",
-      passoutYear,  // Added passoutYear field
+      passoutYear,
       isVerified: false,
       CreatedTime: timestamp,
     };
     await addItem(USERS_TABLE, newUser);
 
-    // Create email verification token
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const verificationToken = {
@@ -89,9 +81,8 @@ exports.register = async (req, res) => {
       expiresAt: expiresAt.toISOString(),
       isUsed: false,
     };
-    await addItem(VERIFICATION_TOKENS_TABLE, verificationToken);  // Use addItem function
+    await addItem(VERIFICATION_TOKENS_TABLE, verificationToken);
 
-    // Send verification email
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
     const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
 
@@ -111,7 +102,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Verify Email Function
 exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -127,17 +117,14 @@ exports.verifyEmail = async (req, res) => {
 
     const { userId, expiresAt, isUsed } = unmarshall(tokenData.Item);
 
-    // Check if token is used
     if (isUsed) {
       return res.status(400).send({ message: "This email has already been verified." });
     }
 
-    // Check if token is expired
     if (new Date() > new Date(expiresAt)) {
       return res.status(400).send({ message: "Verification link has expired." });
     }
 
-    // Retrieve the user
     const userParams = {
       TableName: USERS_TABLE,
       Key: marshall({ userId }),
@@ -149,9 +136,8 @@ exports.verifyEmail = async (req, res) => {
     }
 
     const user = unmarshall(userData.Item);
-    const passoutYear = user.passoutYear; // Use passoutYear instead of rollNumber
+    const passoutYear = user.passoutYear;
 
-    // Mark user as verified
     const updateUserParams = {
       TableName: USERS_TABLE,
       Key: marshall({ userId }),
@@ -162,7 +148,6 @@ exports.verifyEmail = async (req, res) => {
     };
     await dynamoDB.send(new UpdateItemCommand(updateUserParams));
 
-    // Check if batch exists
     const batchParams = {
       TableName: BATCHES_TABLE,
       Key: marshall({ year: passoutYear }),
@@ -170,14 +155,12 @@ exports.verifyEmail = async (req, res) => {
     const batchData = await dynamoDB.send(new GetItemCommand(batchParams));
 
     if (!batchData.Item) {
-      // Create new batch if it doesn't exist
       const newBatch = {
         year: passoutYear,
         students: [userId],
       };
       await addItem(BATCHES_TABLE, newBatch);
     } else {
-      // Add user to existing batch
       const updateBatchParams = {
         TableName: BATCHES_TABLE,
         Key: marshall({ year: passoutYear }),
@@ -190,7 +173,6 @@ exports.verifyEmail = async (req, res) => {
       await dynamoDB.send(new UpdateItemCommand(updateBatchParams));
     }
 
-    // Mark token as used
     const updateTokenParams = {
       TableName: VERIFICATION_TOKENS_TABLE,
       Key: marshall({ token }),
@@ -208,7 +190,6 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-// Login Function
 exports.login = async (req, res) => {
   try {
     const { rollNumber, password } = req.body;
@@ -224,7 +205,6 @@ exports.login = async (req, res) => {
       ExpressionAttributeValues: marshall({
         ":rollNumber": rollNumber,
       }),
-      //ProjectionExpression: "userId, name, role, isVerified",
     };
     const userData = await dynamoDB.send(new QueryCommand(userParams));
 
@@ -251,7 +231,7 @@ exports.login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const decodedToken = jwt.decode(token); // Debugging to check token payload
+    const decodedToken = jwt.decode(token);
     console.log("Decoded token in login:", decodedToken);
 
     res.status(200).send({ message: "Login successful", token });
@@ -261,10 +241,9 @@ exports.login = async (req, res) => {
   }
 };
 
-// Fetch User Details
 exports.getUserDetails = async (req, res) => {
   try {
-    const userId = req.studentId; // Extract from JWT token
+    const userId = req.studentId;
 
     const params = {
       TableName: USERS_TABLE,
@@ -278,7 +257,7 @@ exports.getUserDetails = async (req, res) => {
     }
 
     const user = unmarshall(result.Item);
-    delete user.password; // Remove password before sending
+    delete user.password;
 
     res.status(200).send(user);
   } catch (error) {
@@ -290,7 +269,7 @@ exports.getUserDetails = async (req, res) => {
 // Update User Details
 exports.updateUser = async (req, res) => {
   try {
-    const userId = req.studentId; // Extract from JWT token
+    const userId = req.studentId;
     const { name, gender, passoutYear, password } = req.body;
     
     let updateExpression = "SET #name = :name, gender = :gender, passoutYear = :passoutYear";
@@ -314,7 +293,7 @@ exports.updateUser = async (req, res) => {
       Key: marshall({ userId }),
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: marshall(expressionValues),
-      ExpressionAttributeNames: expressionNames, // ADD THIS LINE
+      ExpressionAttributeNames: expressionNames,
     };
     
     await dynamoDB.send(new UpdateItemCommand(params));    
@@ -333,7 +312,6 @@ exports.requestVerificationLink = async (req, res) => {
       return res.status(400).send({ message: "Email is required" });
     }
 
-    // Check if user exists
     const checkEmailParams = {
       TableName: USERS_TABLE,
       IndexName: "email-index",
@@ -354,7 +332,6 @@ exports.requestVerificationLink = async (req, res) => {
       return res.status(400).send({ message: "This email is already verified." });
     }
 
-    // Check if an existing token exists for the user
     const checkTokenParams = {
       TableName: VERIFICATION_TOKENS_TABLE,
       FilterExpression: "userId = :userId",
@@ -365,7 +342,6 @@ exports.requestVerificationLink = async (req, res) => {
     const tokenResult = await dynamoDB.send(new ScanCommand(checkTokenParams));
 
     if (tokenResult.Items && tokenResult.Items.length > 0) {
-      // Mark previous tokens as used
       for (const item of tokenResult.Items) {
         const tokenItem = unmarshall(item);
         if (!tokenItem.isUsed) {
@@ -382,9 +358,8 @@ exports.requestVerificationLink = async (req, res) => {
       }
     }
 
-    // Generate new verification token
     const newToken = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // Valid for 24 hours
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const newVerificationToken = {
       token: newToken,
@@ -395,7 +370,6 @@ exports.requestVerificationLink = async (req, res) => {
 
     await addItem(VERIFICATION_TOKENS_TABLE, newVerificationToken);
 
-    // Send new verification email
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const verificationUrl = `${baseUrl}/verify-email?token=${newToken}`;
 

@@ -9,7 +9,7 @@ const AdminHome = () => {
     const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken'); // or sessionStorage.getItem('token');
+    const authToken = localStorage.getItem('authToken');
     if (!authToken) {
       alert("Unauthorized Access!, Login First!");
       navigate('/');
@@ -25,7 +25,7 @@ const AdminHome = () => {
             headers: { "x-auth-token": localStorage.getItem("authToken") },
           });
           console.log("Batches fetched:", response.data);
-          // Sort batches numerically based on the "year" field
+          
           const sortedBatches = response.data.batches.sort(
             (a, b) => parseInt(a.year) - parseInt(b.year)
           );
@@ -33,10 +33,9 @@ const AdminHome = () => {
         setBatches(sortedBatches);
       } catch (error) {
         if (error.response && error.response.status === 401) {
-          // Token expired or authentication error
           alert("Session expired. Please log in again.");
-          localStorage.removeItem("authToken"); // Clear the token
-          navigate("/"); // Redirect to login page
+          localStorage.removeItem("authToken");
+          navigate("/");
         } else {
         console.error("Error fetching batches:", error);
         }
@@ -52,14 +51,13 @@ const AdminHome = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken'); // or sessionStorage
+    localStorage.removeItem('authToken');
     window.location.href = '/';
   };
   
 
   return (
     <div className="admin-home-container">
-      {/* Header Section */}
       <header className="AdminHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="AdminHeader-logo" />
         <img
@@ -92,7 +90,6 @@ const AdminHome = () => {
         </div>
       </div>
   
-      {/* Footer Section */}
       <footer className="footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>

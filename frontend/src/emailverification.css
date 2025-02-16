@@ -19,7 +19,7 @@
     font-size: 2rem;
     color: #0a0e2c;
     margin-top: 20px;
-    animation: zoomInOut 2s ease-in-out infinite; /* Zoom animation */
+    animation: zoomInOut 2s ease-in-out infinite;
   }
   
   .gif-container {
@@ -28,21 +28,20 @@
     justify-content: center;
     width: 100%;
     margin: 20px 0;
-    animation: zoomInOut 2s ease-in-out infinite; /* Zoom animation */
+    animation: zoomInOut 2s ease-in-out infinite;
   }
   
   .verification-gif {
     width: 500px;
     height: auto;
   }
-  
-  /* Zoom Animation Keyframes */
+
   @keyframes zoomInOut {
     0%, 100% {
-      transform: scale(1); /* Original size */
+      transform: scale(1);
     }
     50% {
-      transform: scale(1.2); /* Zoomed-in size */
+      transform: scale(1.2);
     }
   }
   

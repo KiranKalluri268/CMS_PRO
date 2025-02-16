@@ -2,14 +2,13 @@ const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const { dynamoDB } = require("../util/dynamodb");
-const { GetCommand, QueryCommand, PutCommand, ScanCommand, BatchGetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb"); // Import DynamoDB commands
+const { QueryCommand, PutCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 
 exports.requestPasswordReset = async (req, res) => {
   const { email } = req.body;
 
   if (!email) return res.status(400).json({ message: "Email is required" });
 
-  // Check if user exists
   const userParams = {
     TableName: process.env.USERS_TABLE,
     IndexName: "email-index",
@@ -22,11 +21,9 @@ exports.requestPasswordReset = async (req, res) => {
 
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  // Generate reset token
   const token = uuidv4();
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-  // Save token to database
   const tokenParams = {
     TableName: process.env.PASSWORD_RESET_TABLE,
     Item: {
@@ -38,7 +35,6 @@ exports.requestPasswordReset = async (req, res) => {
   };
   await dynamoDB.send(new PutCommand(tokenParams));
 
-  // Send reset link via email
   const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
   const transporter = nodemailer.createTransport({
     service: "Gmail",
@@ -65,16 +61,15 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Token and new password are required" });
     }
   
-    // Validate token
     const tokenParams = {
       TableName: process.env.PASSWORD_RESET_TABLE,
-      IndexName: "resetToken-index",  // Use the GSI with resetToken as partition key
-      KeyConditionExpression: "#resetToken = :token", // Query by resetToken
+      IndexName: "resetToken-index",
+      KeyConditionExpression: "#resetToken = :token",
       ExpressionAttributeNames: {
-        "#resetToken": "resetToken",  // Alias for resetToken
+        "#resetToken": "resetToken",
       },
       ExpressionAttributeValues: {
-        ":token": token, // The token value
+        ":token": token,
       },
     };
   
@@ -89,10 +84,8 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Token is no longer valid" });
     }
   
-    // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
   
-    // Update user's password
     const updateUserParams = {
       TableName: process.env.USERS_TABLE,
       Key: { userId },
@@ -102,7 +95,6 @@ exports.resetPassword = async (req, res) => {
   
     await dynamoDB.send(new UpdateCommand(updateUserParams));
   
-    // Mark token as used
     const updateTokenParams = {
       TableName: process.env.PASSWORD_RESET_TABLE,
       Key: { resetToken: token },

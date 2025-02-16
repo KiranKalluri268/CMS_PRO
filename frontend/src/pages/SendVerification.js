@@ -25,7 +25,6 @@ const SendVerification = () => {
 
   return (
     <div className="forgot-container">
-      {/* Header Section */}
       <header className="ForgotHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="ForgotHeader-logo" />
       </header>
@@ -53,7 +52,6 @@ const SendVerification = () => {
         {error && <p className="error">{error}</p>}
       </div>
 
-      {/* Footer Section */}
       <footer className="footer">
         <p>&copy; 2024 Vaagdevi Colleges. All Rights Reserved.</p>
       </footer>

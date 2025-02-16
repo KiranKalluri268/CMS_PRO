@@ -1,8 +1,6 @@
-/* Global Styles */
-
 .table-wrapper {
   width: 100%;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-x: auto;
   overflow-y: auto;
   margin-top: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -24,8 +22,8 @@ button {
 
 button:hover {
   box-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.8), 
-  0 0 8px 8px rgba(255, 255, 255, 0.6), 
-  0 0 10px 12px rgba(255, 255, 255, 0.4);
+              0 0 8px 8px rgba(255, 255, 255, 0.6), 
+              0 0 10px 12px rgba(255, 255, 255, 0.4);
 }
 
 header, footer {
@@ -43,24 +41,22 @@ body {
   padding: 0;
   font-family: Arial, sans-serif;
   background: radial-gradient(rgba(255, 255, 255, 0.5), rgba(255, 1, 1, 0.308)), 
-  url('../public/images/Vaagdevi-Logo.png') no-repeat center center fixed;
+              url('../public/images/Vaagdevi-Logo.png') no-repeat center center fixed;
   background-size: contain;
 }
 
 #root {
-  height: 100%; /* Ensures the app takes full height */
+  height: 100%;
 }
 
 .page-container {
-  position: relative; /* Ensures content layers correctly */
+  position: relative;
   z-index: 1;
 }
 
-/* Ensuring the layout is flexible */
 .App {
   text-align: center;
 }
-
 
 .App-header {
   background-color: #282c3465;
@@ -77,27 +73,22 @@ body {
   color: #61dafb;
 }
 
-/* Responsive Styles */
-
-/* For mobile devices */
 @media (max-width: 768px) {
   .App-header {
-    font-size: 18px; /* Adjust font size for mobile */
+    font-size: 18px;
     text-align: center;
     padding: 20px;
   }
 
   .App-logo {
-    height: 30vmin; /* Smaller logo size for mobile */
+    height: 30vmin;
   }
 
-  /* Adjusting the background for mobile */
   body {
     background-size: cover;
     background-position: center;
   }
 
-  /* Adjusting app content for mobile */
   .page-container {
     padding: 10px;
   }
@@ -110,25 +101,23 @@ body {
   }
 }
 
-/* For tablet devices (between 768px and 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
   .App-header {
-    font-size: 22px; /* Adjust font size for tablet */
+    font-size: 22px;
   }
 
   .App-logo {
-    height: 35vmin; /* Adjust logo size for tablet */
+    height: 35vmin;
   }
 }
 
-/* For desktop devices (1024px and up) */
 @media (min-width: 1024px) {
   .App-header {
-    font-size: calc(10px + 4vmin); /* Larger font for larger screens */
+    font-size: calc(10px + 4vmin);
   }
 
   .App-logo {
-    height: 40vmin; /* Keep the original logo size for large screens */
+    height: 40vmin;
   }
 }
 

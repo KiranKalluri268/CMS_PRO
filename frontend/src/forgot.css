@@ -1,10 +1,9 @@
-/* Center the entire container on the page */
 .forgot-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; /* Full viewport height to center the box */
+    height: 100vh;
     background-color: #f7f1f169;
     margin: 0;
   }
@@ -26,8 +25,7 @@
     max-height: 100px;
     object-fit: contain;
   }
-  
-  /* Forgot form box */
+
   .forgot-box {
     background-color: #dfdddd00;
     backdrop-filter: blur(5px);
@@ -44,16 +42,14 @@
   .forgot-title {
     color: #970f0f;
   }
-  
-  /* Form elements */
+
   .forgot-input-group {
     margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  
-  /* Label styling */
+
   .forgot-input-group label {
     display: inline-block;
     width: 80px;
@@ -62,8 +58,7 @@
     color: #7e7676;
     text-align: right;
   }
-  
-  /* Input fields */
+
   .forgot-input-group input,
   .forgot-input-group select {
     flex-grow: 1;
@@ -74,8 +69,7 @@
     font-size: 14px;
     box-sizing: border-box;
   }
-  
-  /* Forgot button */
+
   .forgot-box button {
     width: 75%;
     padding: 10px;
@@ -89,20 +83,17 @@
     margin-top: 10px;
     margin-bottom: 10px;
   }
-  
-  /* Hover effect on button */
+
   .forgot-box button:hover {
     background-color: #970f0f;
   }
-  
-  /* Heading styling */
+
   .forgot-box h1 {
     font-size: 24px;
     margin-top: 0px;
     margin-bottom: 30px;
   }
-  
-  /* Footer styling */
+
   .footer {
     width: 100%;
     background-color: #333;
@@ -118,15 +109,14 @@
     margin: 0;
     font-size: 14px;
   }
-  
-  /* Mobile responsiveness */
+
   @media (max-width: 768px) {
     .ForgotHeader-logo {
-      max-width: 300px; /* Reduce size for smaller screens */
+      max-width: 300px;
     }
   
     .forgot-box {
-      width: 72%; /* Reduce the width for smaller screens */
+      width: 72%;
       padding: 20px;
     }
   
@@ -135,14 +125,13 @@
     }
   
     .forgot-box button {
-      width: 75%; /* Adjust button width for smaller screens */
+      width: 75%;
     }
   }
-  
-  /* Tablet responsiveness */
+
   @media (min-width: 768px) and (max-width: 1024px) {
     .forgot-box {
-      width: 30%; /* Allow more space on tablets */
+      width: 30%;
     }
   
     .forgot-box h1 {
@@ -150,7 +139,7 @@
     }
   
     .forgot-box button {
-      width: 80%; /* Adjust button size for tablets */
+      width: 80%;
     }
   }
   
