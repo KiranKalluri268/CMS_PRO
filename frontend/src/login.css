@@ -113,12 +113,12 @@
 
 .footer-info {
   position: relative;
-  font-weight: bolder;
+  font-weight: bold;
   width: 92%;
   display: flex;
   justify-content: space-between;
   padding: 10px 50px;
-  color: #525151;
+  color: #000000;
 }
 
 .footer-left {
