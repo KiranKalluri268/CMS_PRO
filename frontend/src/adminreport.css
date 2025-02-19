@@ -1,92 +1,96 @@
+/* General Styles */
+:root {
+  --primary-color: #970f0f;
+  --secondary-color: #4caf50;
+  --background-blur: rgba(215, 215, 215, 0.25);
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f6f6;
+}
+
+/* Admin Report Container */
 .admin-report-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: #f7f6f641;
-  margin: 0;
-  margin-top: 0px;
-  padding-top: 0px;
-  overflow-y: auto;
-  height: calc(100vh);
+  background-color: var(--background-blur);
+  min-height: 100vh;
+  padding: 0rem;
 }
 
+/* Header */
 .AdminReportHeader {
-  background-color: #dfdddd65;
+  background-color: var(--background-blur);
   backdrop-filter: blur(5px);
-  padding: 20px 0;
+  padding: 1.5rem 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
-  position: sticky;
+  width: 100%;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
   z-index: 1000;
 }
 
+/* Logo Styling */
 .AdminReportHeader-logo {
-  width: auto;
-  height: 100%;
-  max-height: 100px;
+  height: auto;
+  max-height: 6rem;
   object-fit: contain;
+  width: 70vw;
 }
 
 .AdminReportLogoout-logo {
-  width: auto;
-  height: 100%;
-  max-height: 80px;
+  max-height: 5rem;
+  width: 15vw;
   object-fit: contain;
   position: absolute;
-  right: 0px;
-  bottom: 25px;
+  right: 1rem;
+  bottom: 1.5rem;
   opacity: 0.7;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.AdminReportLogoout-logo:hover {
+.AdminReportLogout-logo:hover {
   opacity: 1;
 }
 
+/* Batch Title */
 .batch-title {
-  color: #970f0f;
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  text-align: center;
 }
 
+/* Report List */
 .report-list {
-  background-color: #dfdddd00;
+  background-color: var(--background-blur);
   backdrop-filter: blur(5px);
-  padding: 1%;
+  padding: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  width: 95% !important;
+  width: 95vw;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 45px !important;
-  margin-bottom: 45px;
-  max-height: 621px;
+  margin-top: 22vh;
+  max-height: 65vh;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-.report-list button:hover {
-  background-color: #970f0f;
+.report-list:hover {
+  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
+              0 0 20px 10px rgba(255, 255, 255, 0.5), 
+              0 0 30px 15px rgba(255, 255, 255, 0.3);
 }
 
-.Adminreport-footer {
-  width: 100%;
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 10px 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: absolute;
-  bottom: 0;
-}
-
-.Adminreport-footer p {
-  margin: 0;
-  font-size: 14px;
-}
-
+/* Report Table */
 .report-table {
   width: 100%;
   border-collapse: collapse;
@@ -95,65 +99,29 @@
 
 .report-table th,
 .report-table td {
-  padding: 10px;
+  padding: 1rem;
   text-align: left;
   border: 1px solid #ddd;
   white-space: nowrap;
 }
 
 .report-table th {
-  background-color: #4caf50;
+  background-color: var(--secondary-color);
   font-weight: bold;
+  color: white;
 }
 
-@media (max-width: 768px) {
-  .report-list {
-    width: 80%;
-    margin-top: 120px;
-    max-height: 660px;
-  }
-
-  .AdminReportLogoout-logo {
-    max-width: 40px;
-  }
-
-  .report-table-wrapper {
-    width: 100%;
-  }
-
-  .AdminReportHeader-logo {
-    max-width: 480px;
-  }
-
-  .footer {
-    padding: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .AdminReportHeader-logo {
-    max-width: 340px;
-  }
-  .report-list {
-    width: 80%;
-    margin-top: 0px;
-  }
-
-  .batch-title {
-    font-size: 18px;
-  }
-
-  .footer {
-    padding: 20px;
-  }
-}
-
-.report-list {
-  transition: box-shadow 0.s ease;
-}
-
-.report-list:hover {
-  box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7), 
-              0 0 20px 10px rgba(255, 255, 255, 0.5), 
-              0 0 30px 15px rgba(255, 255, 255, 0.3);
+/* Footer */
+.Adminreport-footer {
+  width: 100%;
+  background-color: #333;
+  color: white;
+  display: flex; /* Enables flexbox */
+  align-items: center; /* Vertically centers the text */
+  justify-content: center; /* Horizontally centers the text */
+  text-align: center;
+  height: 5vh; /* Ensure enough space for text */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  bottom: 0;
 }

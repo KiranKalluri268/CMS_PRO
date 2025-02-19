@@ -111,7 +111,7 @@ const Register = () => {
 
   return (
     <div className="register-container">
-      <header className="header">
+      <header className="RegisterHeader">
         <img src="/images/Vaagdevi.png" alt="Logo" className="RegisterHeader-logo" />
       </header>
 
