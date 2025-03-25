@@ -131,7 +131,13 @@ const Login = () => {
       <footer className="footer">
       <div className="footer-info">
       <p className="footer-left">
-  Developed by: <span className="name">Kalluri Saikiran</span><br />
+  Developed by: <span 
+  className="name" 
+  onClick={() => window.open("https://kirankalluri.vercel.app/", "_blank")}
+  style={{ cursor: "pointer", textDecoration: "underline" }}
+>
+  Kalluri Saikiran
+</span><br />
   Under the guidance of: <span className="name">Dr. C Madan Kumar</span>
 </p>
 <p className="footer-right">
