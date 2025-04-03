@@ -67,6 +67,42 @@ body {
   text-align: center;
 }
 
+.filter-container {
+  margin-bottom: 0;
+  text-align: left;
+  width: 95%;
+}
+
+.filter-group {
+  margin-bottom: 0;
+}
+
+.filter-group strong {
+  margin-left: 2rem;
+  margin-right: 1rem;
+}
+
+.filter-option {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s;
+}
+
+.filter-option:hover {
+  background-color: #ddd;
+}
+
+.active-filter {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
 /* Report List */
 .report-list {
   background-color: var(--background-blur);

@@ -6,11 +6,14 @@ import "../adminreport.css";
 
 const AdminReport = () => {
   const { batchYear } = useParams();
+  const navigate = useNavigate();
+
   const [certificates, setCertificates] = useState([]);
   const [filteredCertificates, setFilteredCertificates] = useState([]);
-  const [academicYear, setAcademicYear] = useState("");
   const [years, setYears] = useState([]);
-  const navigate = useNavigate();
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedAcademicYears, setSelectedAcademicYears] = useState([]);
+  const [selectedGenders, setSelectedGenders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
 
@@ -82,20 +85,31 @@ const AdminReport = () => {
   }, [batchYear, navigate]);
   
 
-  const handleFilterChange = (event) => {
-    const selectedYear = event.target.value;
-    setAcademicYear(selectedYear);
-  
-    if (selectedYear) {
-      const filtered = certificates.filter(certificate => {
-        const academicYear = getAcademicYear(certificate.toDate);
-        return academicYear === selectedYear;
-      });
-      setFilteredCertificates(filtered);
-    } else {
-      setFilteredCertificates(certificates);
-    }
+  // Function to toggle filter selection
+  const toggleFilter = (filter, setFilterState) => {
+    setFilterState((prevFilters) =>
+      prevFilters.includes(filter)
+        ? prevFilters.filter((f) => f !== filter) // Unselect if already selected
+        : [...prevFilters, filter] // Select if not already selected
+    );
   };
+
+  // Apply filters dynamically
+  useEffect(() => {
+    let filtered = certificates;
+
+    if (selectedTypes.length > 0) {
+      filtered = filtered.filter((c) => selectedTypes.includes(c.type || "N/A"));
+    }
+    if (selectedAcademicYears.length > 0) {
+      filtered = filtered.filter((c) => selectedAcademicYears.includes(getAcademicYear(c.toDate)));
+    }
+    if (selectedGenders.length > 0) {
+      filtered = filtered.filter((c) => selectedGenders.includes(c.student.gender || "N/A"));
+    }
+
+    setFilteredCertificates(filtered);
+  }, [selectedTypes, selectedAcademicYears, selectedGenders, certificates]);
   
 
   const handleDownload = async (downloadLink, fileName) => {
@@ -219,20 +233,53 @@ const AdminReport = () => {
         <h2 className="batch-title">Certificates for Batch {batchYear}</h2>
 
         <div className="filter-container">
-          <label htmlFor="academic-year-filter">Filter by Academic Year:</label>
-          <select
-            id="academic-year-filter"
-            value={academicYear}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Years</option>
-            {years.map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div><br/>
+  <h3>Filters:</h3>
 
-        <button className="download-report-btn" onClick={handleDownloadExcel}>
+  {/* Certificate Types */}
+  <div className="filter-group">
+            <strong>Certificate Types:</strong>
+            {Array.from(new Set(certificates.map(c => c.type || "N/A"))).map((type) => (
+              <span
+                key={type}
+                className={`filter-option ${selectedTypes.includes(type) ? "active-filter" : ""}`}
+                onClick={() => toggleFilter(type, setSelectedTypes)}
+              >
+                {type}
+              </span>
+            ))}
+          </div>
+
+  {/* Academic Years */}
+  <div className="filter-group">
+            <strong>Academic Years:</strong>
+            {years.map((year) => (
+              <span
+                key={year}
+                className={`filter-option ${selectedAcademicYears.includes(year) ? "active-filter" : ""}`}
+                onClick={() => toggleFilter(year, setSelectedAcademicYears)}
+              >
+                {year}
+              </span>
+            ))}
+          </div>
+
+          {/* Genders */}
+          <div className="filter-group">
+            <strong>Genders:</strong>
+            {Array.from(new Set(certificates.map(c => c.student.gender || "N/A"))).map((gender) => (
+              <span
+                key={gender}
+                className={`filter-option ${selectedGenders.includes(gender) ? "active-filter" : ""}`}
+                onClick={() => toggleFilter(gender, setSelectedGenders)}
+              >
+                {gender}
+              </span>
+            ))}
+          </div>
+        </div>
+<br/>
+
+<button className="download-report-btn" onClick={handleDownloadExcel}>
           Download Report as Excel
         </button>
 

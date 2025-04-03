@@ -9,7 +9,7 @@ const {
   UpdateCommand,
   DeleteCommand,
 } = require('@aws-sdk/lib-dynamodb');
-const {QueryCommand, DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { QueryCommand, DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
 const dynamoDB = new DynamoDBClient({ region: process.env.AWS_REGION });
@@ -45,6 +45,7 @@ exports.updateCertificate = async (req, res) => {
         course: updatedFields.course || existingCertificate.course,
         fromDate: updatedFields.fromDate || existingCertificate.fromDate,
         toDate: updatedFields.toDate || existingCertificate.toDate,
+        type: updatedFields.type || existingCertificate.type,
       };
 
       const uploadResponse = await uploadFile(req.file.buffer, metadata, pdfId);
@@ -142,10 +143,15 @@ exports.getCertificatesByStudent = async (req, res) => {
 
 exports.uploadCertificate = async (req, res) => {
   try {
-    const { organisation, course, fromDate, toDate, certificateLink } = req.body;
+    const { organisation, course, fromDate, toDate, certificateLink, type } = req.body;
+    console.log("received in backend:",req.body)
 
     if (!req.studentId) {
-      return res.status(400).json({ message: "Student ID not Found Please Login again" });
+      return res.status(400).json({ message: "Student ID not Found. Please Login again." });
+    }
+
+    if (!type) {
+      return res.status(400).json({ message: "Certificate type is required." });
     }
 
     if (!req.file && !certificateLink) {
@@ -158,6 +164,7 @@ exports.uploadCertificate = async (req, res) => {
       course: course || "",
       fromDate: fromDate?.toString() || "",
       toDate: toDate?.toString() || "",
+      type: type || "",
     };
 
     let pdfId = null;
@@ -190,6 +197,7 @@ exports.uploadCertificate = async (req, res) => {
         course,
         fromDate,
         toDate,
+        type,
         batchYear,
         CreatedTime: timestamp,
         LastUpdatedTime: timestamp,
@@ -299,14 +307,4 @@ exports.deleteCertificate = async (req, res) => {
     console.error("Error deleting certificate:", error);
     res.status(500).json({ msg: "Server error" });
   }
-};
-
-const getAcademicYears = (start, end) => {
-  const years = [];
-  let currentYearStart = new Date(start.getFullYear(), 5, 1);
-  while (currentYearStart <= end) {
-    years.push(`${currentYearStart.getFullYear()}-${currentYearStart.getFullYear() + 1}`);
-    currentYearStart = new Date(currentYearStart.getFullYear() + 1, 5, 1);
-  }
-  return years;
 };
