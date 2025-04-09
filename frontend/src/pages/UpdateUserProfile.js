@@ -122,10 +122,21 @@ let decodedToken;
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    window.location.href = "/";
+  };
+
   return (
     <div className="register-container">
-      <header className="header">
-        <img src="/images/Vaagdevi.png" alt="Logo" className="RegisterHeader-logo" />
+      <header className="AdminReportHeader">
+        <img src="/images/Vaagdevi.png" alt="Logo" className="AdminReportHeader-logo" />
+        <img
+          src="/images/logout-icon.png"
+          alt="Logout"
+          className="AdminReportLogoout-logo"
+          onClick={handleLogout}
+        />
       </header>
 
       <div className="register-box">

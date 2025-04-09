@@ -189,6 +189,7 @@ const AdminReport = () => {
         RollNo: certificate.student.rollNumber,
         Name: certificate.student.name,
         Gender: certificate.student.gender,
+        Type: certificate.type,
         Organisation: certificate.organisation,
         Course: certificate.course,
         FromDate: new Date(certificate.fromDate).toLocaleDateString(),
@@ -292,6 +293,7 @@ const AdminReport = () => {
           <th>Roll No</th>
           <th>Name</th>
           <th>Gender</th>
+          <th>Certificate Type</th>
           <th>Title of the event</th>
           <th>Organised by</th>
           <th>From</th>
@@ -308,6 +310,7 @@ const AdminReport = () => {
             <td>{certificate.student.rollNumber}</td>
             <td>{certificate.student.name}</td>
             <td>{certificate.student.gender}</td>
+            <td>{certificate.type}</td>
             <td>
               <span
                 style={{

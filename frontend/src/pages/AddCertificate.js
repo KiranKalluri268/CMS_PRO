@@ -151,6 +151,7 @@ const AddCertificate = ({ rollNumber: studentId }) => {
               <option value="Internship">Internship</option>
               <option value="Course">Course</option>
               <option value="Events">Events</option>
+              <option value="MSME-Internship">MSME Internship</option>
               <option value="Other">Other</option>
             </select>
           </div>

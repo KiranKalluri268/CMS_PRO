@@ -308,3 +308,13 @@ exports.deleteCertificate = async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 };
+
+const getAcademicYears = (start, end) => {
+  const years = [];
+  let currentYearStart = new Date(start.getFullYear(), 5, 1);
+  while (currentYearStart <= end) {
+    years.push(`${currentYearStart.getFullYear()}-${currentYearStart.getFullYear() + 1}`);
+    currentYearStart = new Date(currentYearStart.getFullYear() + 1, 5, 1);
+  }
+  return years;
+};
