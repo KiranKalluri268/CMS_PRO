@@ -16,6 +16,7 @@ const AdminReport = () => {
   const [selectedGenders, setSelectedGenders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
+  const [selectedOrganisers, setSelectedOrganisers] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -108,10 +109,15 @@ const AdminReport = () => {
       filtered = filtered.filter((c) => selectedGenders.includes(c.student.gender || "N/A"));
     }
 
-    setFilteredCertificates(filtered);
-  }, [selectedTypes, selectedAcademicYears, selectedGenders, certificates]);
-  
+    if (selectedOrganisers.length > 0) {
+      filtered = filtered.filter((c) =>
+        selectedOrganisers.includes(c.organisation || "N/A")
+      );
+    }
 
+    setFilteredCertificates(filtered);
+  }, [selectedTypes, selectedAcademicYears, selectedGenders, certificates, selectedOrganisers]);
+  
   const handleDownload = async (downloadLink, fileName) => {
     if (!downloadLink) {
       alert("No download link available.");
@@ -135,7 +141,6 @@ const AdminReport = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading file:', error);
@@ -154,7 +159,6 @@ const AdminReport = () => {
   const calculateDuration = (fromDate, toDate) => {
     const start = new Date(fromDate);
     const end = new Date(toDate);
-  
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
     let days = end.getDate() - start.getDate();
@@ -178,7 +182,6 @@ const AdminReport = () => {
     if (months > 0) durationStr.push(`${months} month${months > 1 ? "s" : ""}`);
     if (weeks > 0) durationStr.push(`${weeks} week${weeks > 1 ? "s" : ""}`);
     if (days > 0) durationStr.push(`${days} day${days > 1 ? "s" : ""}`);
-  
     return durationStr.length > 0 ? durationStr.join("-") : "0 days";
   };
 
@@ -249,6 +252,20 @@ const AdminReport = () => {
               </span>
             ))}
           </div>
+
+  {/* Organised by */}
+<div className="filter-group">
+  <strong>Organised by:</strong>
+  {Array.from(new Set(certificates.map(c => c.organisation || "N/A"))).map((org) => (
+    <span
+      key={org}
+      className={`filter-option ${selectedOrganisers.includes(org) ? "active-filter" : ""}`}
+      onClick={() => toggleFilter(org, setSelectedOrganisers)}
+    >
+      {org}
+    </span>
+  ))}
+</div>
 
   {/* Academic Years */}
   <div className="filter-group">

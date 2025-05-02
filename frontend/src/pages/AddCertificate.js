@@ -151,8 +151,6 @@ const AddCertificate = ({ rollNumber: studentId }) => {
               <option value="Internship">Internship</option>
               <option value="Course">Course</option>
               <option value="Events">Events</option>
-              <option value="MSME-Internship">MSME Internship</option>
-              <option value="Global Quest Technologies">Global Quest Technologies</option>
               <option value="Other">Other</option>
             </select>
           </div>
@@ -172,6 +170,9 @@ const AddCertificate = ({ rollNumber: studentId }) => {
               </option>
               <option value="Cisco">Cisco</option>
               <option value="MongoDB">MongoDB</option>
+              
+              <option value="MSME-Internship">MSME</option>
+              <option value="Global Quest Technologies">Global Quest Technologies</option>
               <option value="Other">Other</option>
             </select>
           </div>
