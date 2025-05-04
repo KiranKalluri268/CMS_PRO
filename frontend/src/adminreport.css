@@ -89,12 +89,12 @@ body {
   border: 1px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
-  background-color: #f8f9fa;
+  background-color: #f8f9fa8e;
   transition: background-color 0.3s;
 }
 
 .filter-option:hover {
-  background-color: #ddd;
+  background-color: #5d8fbe;
 }
 
 .active-filter {
